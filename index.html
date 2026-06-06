@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CNC Feeds &amp; Speeds Calculator</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header>
+    <div class="container">
+      <h1>CNC Feeds &amp; Speeds <span>Calculator</span></h1>
+      <p>For 3-axis CNC milling &mdash; based on chip load theory</p>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+
+      <!-- Card 1: Calculator -->
+      <section class="card" id="calculator">
+        <div class="card-header">
+          <div class="accent-bar"></div>
+          <h2>Calculate Feeds &amp; Speeds</h2>
+        </div>
+
+        <div class="calc-form">
+          <div class="form-field">
+            <label for="inp-machine">CNC Machine</label>
+            <select id="inp-machine">
+              <option value="">— select —</option>
+              <option value="EVO">EVO</option>
+              <option value="PRO">PRO</option>
+              <option value="FAB">FAB</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="inp-diameter">Tool Diameter</label>
+            <div class="input-suffix">
+              <input type="number" id="inp-diameter" min="1" max="20" step="0.5" placeholder="e.g. 6">
+              <span>mm</span>
+            </div>
+            <span class="range-note" id="diameter-range-note">Clamped to table range (2–10 mm)</span>
+          </div>
+
+          <div class="form-field">
+            <label for="inp-flutes"># Flutes</label>
+            <select id="inp-flutes">
+              <option value="">— select —</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="inp-material">Material</label>
+            <select id="inp-material">
+              <option value="">— select —</option>
+              <option value="Hardwood">Hardwood</option>
+              <option value="Softwood/Plywood">Softwood / Plywood</option>
+              <option value="MDF/Particleboard">MDF / Particleboard</option>
+              <option value="Soft Plastic">Soft Plastic</option>
+              <option value="Hard Plastic">Hard Plastic</option>
+              <option value="Aluminium">Aluminium</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="results-area" id="results-area">
+          <div class="results-columns">
+
+            <div class="results-panel">
+              <h3 class="results-panel-title">Beginner</h3>
+              <div class="warning-badge" id="feed-warning-beg">
+                Feed rate exceeds 7000 mm/min — verify your setup before cutting.
+              </div>
+              <div class="results-grid">
+                <div class="result-card">
+                  <div class="result-label">Spindle Speed</div>
+                  <div class="result-value" id="out-spindle-beg">—</div>
+                  <div class="result-unit">rpm</div>
+                </div>
+                <div class="result-card" id="rc-feed-beg">
+                  <div class="result-label">Feed Rate</div>
+                  <div class="result-value" id="out-feed-beg">—</div>
+                  <div class="result-unit">mm/min</div>
+                </div>
+                <div class="result-card">
+                  <div class="result-label">Max Depth of Cut</div>
+                  <div class="result-value" id="out-doc-beg">—</div>
+                  <div class="result-unit">mm</div>
+                </div>
+              </div>
+              <p class="chipload-note" id="chipload-note-beg"></p>
+            </div>
+
+            <div class="results-panel">
+              <h3 class="results-panel-title">Advanced</h3>
+              <div class="warning-badge" id="feed-warning-adv">
+                Feed rate exceeds 7000 mm/min — verify your setup before cutting.
+              </div>
+              <div class="results-grid">
+                <div class="result-card">
+                  <div class="result-label">Spindle Speed</div>
+                  <div class="result-value" id="out-spindle-adv">—</div>
+                  <div class="result-unit">rpm</div>
+                </div>
+                <div class="result-card" id="rc-feed-adv">
+                  <div class="result-label">Feed Rate</div>
+                  <div class="result-value" id="out-feed-adv">—</div>
+                  <div class="result-unit">mm/min</div>
+                </div>
+                <div class="result-card">
+                  <div class="result-label">Max Depth of Cut</div>
+                  <div class="result-value" id="out-doc-adv">—</div>
+                  <div class="result-unit">mm</div>
+                </div>
+              </div>
+              <p class="chipload-note" id="chipload-note-adv"></p>
+            </div>
+
+          </div>
+
+          <p class="disclaimer">
+            These are conservative safe starting values. Always do a test cut first and adjust based on your machine, tooling, and material.
+            Depending on the material you should <strong>NOT ALWAYS</strong> use the maximum depth of cut.
+          </p>
+        </div>
+      </section>
+
+      <!-- Card 2: Chip Load Tables -->
+      <section class="card" id="chip-load-tables">
+        <div class="card-header">
+          <div class="accent-bar"></div>
+          <h2>Chip Load Reference Tables</h2>
+        </div>
+        <p class="tables-intro">Values in mm/tooth, derived from the canonical chip load data. Beginner values are 60&thinsp;% of the canonical chip load; Advanced values equal the canonical chip load. Columns match all diameters defined in the data.</p>
+
+        <div class="tables-wrap">
+
+          <div class="table-section">
+            <h3>Beginner</h3>
+            <div class="table-overflow">
+              <table id="tbl-beginner">
+                <thead>
+                  <tr></tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="table-section">
+            <h3>Advanced</h3>
+            <div class="table-overflow">
+              <table id="tbl-advanced">
+                <thead>
+                  <tr></tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Card 3: Formula Reference -->
+      <section class="card" id="formula-reference">
+        <div class="card-header">
+          <div class="accent-bar"></div>
+          <h2>Formula Reference</h2>
+        </div>
+        <div class="formula-box">
+          <div class="formula-main">Feedrate &nbsp;= N &times; Chipload &times; RPM</div>
+          <div class="formula-main">RPM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8776; (22&thinsp;000 &minus; Chipload &times; 30&thinsp;000) &times; Machine index &nbsp;&nbsp;[cap: 24&thinsp;000]</div>
+          <div class="formula-main">Max DOC &nbsp;= Machine DOC factor &times; Tool &empty; &times; Material DOC factor</div>
+          <ul>
+            <li>N &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= number of flutes on the end mill</li>
+            <li>Chipload &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= chip load per tooth (mm/tooth) — interpolated from table</li>
+            <li>RPM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= spindle rotation speed (rev/min)</li>
+            <li>Feedrate &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= table movement speed (mm/min)</li>
+            <li>Machine index &nbsp;= EVO 0.75 / PRO 0.90 / FAB 1.00 (feed &amp; speed scaling)</li>
+            <li>Machine DOC &nbsp;&nbsp;= EVO 0.5&times; / PRO 0.8&times; / FAB 1.0&times; (depth of cut scaling)</li>
+            <li>Material DOC &nbsp;= Hardwood 0.9 / Softwood 1.0 / MDF 1.0 / Soft Plastic 0.8 / Hard Plastic 0.5 / Aluminium 0.25</li>
+          </ul>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>
+        Based on the
+        <a href="https://www.mekanika.io/blogs/knowledge/cnc-feeds-speeds" target="_blank" rel="noopener">
+          Mekanika CNC Feeds &amp; Speeds guide
+        </a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
