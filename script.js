@@ -47,11 +47,12 @@ function roundNearest100(x) {
 
 function calculate(machine, diameter, flutes, material, factor) {
   const m = MACHINES[machine];
-  const chipload = interpolateChipload(material, diameter) * factor;
+  const baseChipload = interpolateChipload(material, diameter);
+  const chipload = baseChipload * factor;
   const docAdj = CHIPLOAD[material].doc;
 
-  // Spindle: (22000 - chipload × 3 × 10000) × machineIndex, capped at 24000
-  const spindleRaw = (22000 - chipload * 3 * 10000) * m.idx;
+  // Spindle is based on material and diameter only; mode scaling affects feed.
+  const spindleRaw = (22000 - baseChipload * 3 * 10000) * m.idx;
   const spindle = roundNearest100(Math.min(spindleRaw, 24000));
 
   // Feed: chipload × flutes × spindle RPM, rounded to nearest 100
