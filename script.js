@@ -10,7 +10,7 @@ const MACHINES = {
 const DIAMETERS = [2, 3, 4, 6, 8, 10];
 
 // Scaling factors for beginner / advanced reference tables
-const BEGINNER_FACTOR = 0.60;
+const BEGINNER_FACTOR = 1.00;
 const ADVANCED_FACTOR = 1.00;
 
 // Canonical chipload values + DOC adjustment per material (loads indexed to DIAMETERS)
@@ -45,18 +45,19 @@ function roundNearest100(x) {
   return rounded < 100 && x > 0 ? 100 : rounded;
 }
 
-function calculate(machine, diameter, flutes, material, factor) {
+function calculate(machine, diameter, flutes, material, factor, dampenFeed) {
   const m = MACHINES[machine];
   const baseChipload = interpolateChipload(material, diameter);
   const chipload = baseChipload * factor;
+  const effectiveFlutes = dampenFeed ? (flutes + 1) / 2 : flutes;
   const docAdj = CHIPLOAD[material].doc;
 
   // Spindle is based on material and diameter only; mode scaling affects feed.
   const spindleRaw = (22000 - baseChipload * 3 * 10000) * m.idx;
   const spindle = roundNearest100(Math.min(spindleRaw, 24000));
 
-  // Feed: chipload × flutes × spindle RPM, rounded to nearest 100
-  const feedRaw = chipload * flutes * spindle;
+  // Beginner matches Mekanika's sheet; advanced uses the standard chipload formula.
+  const feedRaw = chipload * effectiveFlutes * spindle * (dampenFeed ? m.idx : 1);
   const feed = roundNearest100(feedRaw);
 
   // Max DOC: machineDocFactor × diameter × materialDocAdjust
@@ -200,8 +201,8 @@ function update() {
 
   const clampedDiam = Math.max(DIAMETERS[0], Math.min(DIAMETERS[DIAMETERS.length - 1], diameter));
 
-  const beg = calculate(machine, clampedDiam, flutes, material, BEGINNER_FACTOR);
-  const adv = calculate(machine, clampedDiam, flutes, material, ADVANCED_FACTOR);
+  const beg = calculate(machine, clampedDiam, flutes, material, BEGINNER_FACTOR, true);
+  const adv = calculate(machine, clampedDiam, flutes, material, ADVANCED_FACTOR, false);
 
   outSpindleBeg.textContent = beg.spindle.toLocaleString('en');
   outFeedBeg.textContent    = beg.feed.toLocaleString('en');

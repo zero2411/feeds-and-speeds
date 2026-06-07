@@ -138,7 +138,7 @@
           <div class="accent-bar"></div>
           <h2>Chip Load Reference Tables</h2>
         </div>
-        <p class="tables-intro">Values in mm/tooth, derived from the canonical chip load data. Beginner values are 60&thinsp;% of the canonical chip load; Advanced values equal the canonical chip load. Columns match all diameters defined in the data.</p>
+        <p class="tables-intro">Values in mm/tooth, derived from the canonical chip load data. Columns match all diameters defined in the data.</p>
 
         <div class="tables-wrap">
 
@@ -176,11 +176,12 @@
           <h2>Formula Reference</h2>
         </div>
         <div class="formula-box">
-          <div class="formula-main">Feedrate &nbsp;= N &times; Chipload &times; RPM</div>
+          <div class="formula-main">Beginner feedrate &nbsp;= N<sub>eff</sub> &times; Chipload &times; RPM &times; Machine index</div>
+          <div class="formula-main">Advanced feedrate &nbsp;= N &times; Chipload &times; RPM</div>
           <div class="formula-main">RPM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8776; (22&thinsp;000 &minus; Chipload &times; 30&thinsp;000) &times; Machine index &nbsp;&nbsp;[cap: 24&thinsp;000]</div>
           <div class="formula-main">Max DOC &nbsp;= Machine DOC factor &times; Tool &empty; &times; Material DOC factor</div>
           <ul>
-            <li>N &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= number of flutes on the end mill</li>
+            <li>N<sub>eff</sub> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= effective flutes: (actual flutes + 1) / 2</li>
             <li>Chipload &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= chip load per tooth (mm/tooth) — interpolated from table</li>
             <li>RPM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= spindle rotation speed (rev/min)</li>
             <li>Feedrate &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= table movement speed (mm/min)</li>
