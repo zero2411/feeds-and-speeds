@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CNC Toolpath Planner</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Main navigation">
+    <div class="container">
+      <a class="site-nav-link" href="index.html">Feeds &amp; Speeds</a>
+      <a class="site-nav-link active" href="toolpath.html">Toolpath Planner</a>
+      <a class="site-nav-link active" href="surface.html">Surface G-Code Generator</a>
+    </div>
+  </nav>
+
+  <header>
+    <div class="container">
+      <h1>CNC Toolpath <span>Planner</span></h1>
+      <p>Estimate stepover, passes, and machining time for simple pocketing jobs</p>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+
+      <section class="card" id="toolpath-planner">
+        <div class="card-header">
+          <div class="accent-bar"></div>
+          <h2>Calculate Pocketing Strategy</h2>
+        </div>
+
+        <div class="calc-form">
+          <div class="form-field">
+            <label for="inp-tool-diameter">Tool Diameter</label>
+            <div class="input-suffix">
+              <input type="number" id="inp-tool-diameter" min="1" step="0.5" placeholder="e.g. 6">
+              <span>mm</span>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="inp-pocket-width">Pocket Width</label>
+            <div class="input-suffix">
+              <input type="number" id="inp-pocket-width" min="1" step="1" placeholder="e.g. 80">
+              <span>mm</span>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="inp-pocket-length">Pocket Length</label>
+            <div class="input-suffix">
+              <input type="number" id="inp-pocket-length" min="1" step="1" placeholder="e.g. 120">
+              <span>mm</span>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="inp-stepover">Stepover</label>
+            <div class="input-suffix">
+              <input type="number" id="inp-stepover" min="5" max="100" step="5" value="40">
+              <span>%</span>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="inp-feedrate">Feed Rate</label>
+            <div class="input-suffix">
+              <input type="number" id="inp-feedrate" min="1" step="100" placeholder="e.g. 2500">
+              <span>mm/min</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="results-area" id="toolpath-results">
+          <div class="results-grid toolpath-results-grid">
+            <div class="result-card">
+              <div class="result-label">Stepover Distance</div>
+              <div class="result-value" id="out-stepover-distance">-</div>
+              <div class="result-unit">mm</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">Lateral Passes</div>
+              <div class="result-value" id="out-passes">-</div>
+              <div class="result-unit">passes</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">Toolpath Length</div>
+              <div class="result-value" id="out-toolpath-length">-</div>
+              <div class="result-unit">mm</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">Cut Time</div>
+              <div class="result-value" id="out-cut-time">-</div>
+              <div class="result-unit">minutes</div>
+            </div>
+          </div>
+
+          <p class="disclaimer">
+            This is a rough planning estimate for straight raster pocketing. Add setup time, lead-ins, retracts, tabs, and finishing passes separately.
+          </p>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <div class="accent-bar"></div>
+          <h2>How To Use This</h2>
+        </div>
+        <div class="formula-box">
+          <div class="formula-main">Stepover distance = Tool diameter &times; Stepover %</div>
+          <div class="formula-main">Passes = Pocket width / Stepover distance</div>
+          <div class="formula-main">Cut time = Toolpath length / Feed rate</div>
+          <ul>
+            <li>Use a lower stepover for smoother surfaces and harder materials.</li>
+            <li>Use the feeds and speeds page to choose a safe starting feed rate.</li>
+            <li>The estimate assumes each pass travels the full pocket length.</li>
+          </ul>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>Use this estimate as a planning aid only. Always verify toolpaths in CAM before cutting.</p>
+    </div>
+  </footer>
+
+  <script src="toolpath.js"></script>
+</body>
+</html>
