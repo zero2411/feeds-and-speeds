@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CNC Surface G-Code Generator</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="surface.css">
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Main navigation">
+    <div class="container">
+      <a class="site-nav-link" href="index.html">Feeds &amp; Speeds</a>
+      <a class="site-nav-link" href="toolpath.html">Toolpath Planner</a>
+      <a class="site-nav-link active" href="surface.html">Surface G-Code Generator</a>
+    </div>
+  </nav>
+
+  <header>
+    <div class="container">
+      <h1>CNC <span>Surface</span> G-Code Generator</h1>
+      <p>Generate simple zig-zag surfacing programs for wooden slabs</p>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+
+      <section class="card" id="surface-generator">
+        <div class="card-header">
+          <div class="accent-bar"></div>
+          <h2>Surfacing Setup</h2>
+        </div>
+
+        <form id="surface-form" novalidate>
+          <h3 class="surface-section-title">Workpiece</h3>
+          <div class="calc-form surface-form-grid">
+             <div class="form-field">
+              <label for="surface-width">Width <span class="surface-info" tabindex="0" aria-label="Width is the distance across the slab on the X axis.">i</span></label>
+              <div class="input-suffix">
+                <input type="number" id="surface-width" min="0.1" step="1" value="500">
+                <span>mm</span>
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="surface-length">Length <span class="surface-info" tabindex="0" aria-label="Length is the distance along the slab on the Y axis.">i</span></label>
+              <div class="input-suffix">
+                <input type="number" id="surface-length" min="0.1" step="1" value="800">
+                <span>mm</span>
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="surface-total-depth">Total Depth <span class="surface-info" tabindex="0" aria-label="Total depth is the full amount of material to remove from the top surface.">i</span></label>
+              <div class="input-suffix">
+                <input type="number" id="surface-total-depth" min="0.1" step="0.1" value="1.5">
+                <span>mm</span>
+              </div>
+            </div>
+          </div>
+
+          <h3 class="surface-section-title">Grain Direction <span class="surface-info" tabindex="0" aria-label="Choose the direction the grain runs so the raster can cut along the grain where possible.">i</span></h3>
+          <fieldset class="surface-radio-group" aria-label="Grain direction">
+            <label class="surface-radio-option">
+              <input type="radio" name="grain-direction" value="X" checked>
+              <span>Along X axis</span>
+            </label>
+            <label class="surface-radio-option">
+              <input type="radio" name="grain-direction" value="Y">
+              <span>Along Y axis</span>
+            </label>
+          </fieldset>
+
+          <h3 class="surface-section-title">Tool Parameters</h3>
+          <div class="calc-form surface-form-grid">
+            <div class="form-field">
+              <label for="surface-bit-diameter">Bit Diameter <span class="surface-info" tabindex="0" aria-label="Bit diameter is the cutting width of the surfacing bit or fly cutter.">i</span></label>
+              <div class="input-suffix">
+                <input type="number" id="surface-bit-diameter" min="0.1" step="0.5" value="25">
+                <span>mm</span>
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="surface-stepover">Stepover <span class="surface-info" tabindex="0" aria-label="Stepover is the percentage of the bit diameter moved sideways between raster passes.">i</span></label>
+              <div class="input-suffix">
+                <input type="number" id="surface-stepover" min="10" max="90" step="5" value="60">
+                <span>%</span>
+              </div>
+            </div>
+          </div>
+
+          <h3 class="surface-section-title">Cutting Parameters</h3>
+          <div class="calc-form surface-form-grid">
+            <div class="form-field">
+              <label for="surface-feedrate">Feedrate <span class="surface-info" tabindex="0" aria-label="Feedrate is how fast the tool moves while cutting.">i</span></label>
+              <div class="input-suffix">
+                <input type="number" id="surface-feedrate" min="1" step="100" value="5000">
+                <span>mm/min</span>
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="surface-rpm">RPM <span class="surface-info" tabindex="0" aria-label="RPM is the spindle speed used for the surfacing operation.">i</span></label>
+              <div class="input-suffix">
+                <input type="number" id="surface-rpm" min="1000" step="500" value="18000">
+                <span>rpm</span>
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="surface-depth-per-pass">Depth Per Pass <span class="surface-info" tabindex="0" aria-label="Depth per pass is the maximum amount removed vertically on each cutting pass.">i</span></label>
+              <div class="input-suffix">
+                <input type="number" id="surface-depth-per-pass" min="0.1" step="0.1" value="0.5">
+                <span>mm</span>
+              </div>
+            </div>
+          </div>
+
+          <h3 class="surface-section-title">Advanced Settings</h3>
+          <div class="calc-form surface-form-grid">
+            <div class="form-field">
+              <label for="surface-safe-z">Safe Z <span class="surface-info" tabindex="0" aria-label="Safe Z is the clearance height used for rapid moves above the workpiece.">i</span></label>
+              <div class="input-suffix">
+                <input type="number" id="surface-safe-z" step="1" value="10">
+                <span>mm</span>
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="surface-start-x">Start X <span class="surface-info" tabindex="0" aria-label="Start X is the work coordinate for the left edge of the surfacing area.">i</span></label>
+              <div class="input-suffix">
+                <input type="number" id="surface-start-x" step="1" value="0">
+                <span>mm</span>
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="surface-start-y">Start Y <span class="surface-info" tabindex="0" aria-label="Start Y is the work coordinate for the front edge of the surfacing area.">i</span></label>
+              <div class="input-suffix">
+                <input type="number" id="surface-start-y" step="1" value="0">
+                <span>mm</span>
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="surface-start-z">Start Z <span class="surface-info" tabindex="0" aria-label="Start Z is the top surface reference before cutting begins.">i</span></label>
+              <div class="input-suffix">
+                <input type="number" id="surface-start-z" step="1" value="0">
+                <span>mm</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="surface-errors" id="surface-errors" hidden></div>
+
+          <div class="surface-actions">
+            <button class="surface-button surface-button-primary" type="submit">Generate G-Code</button>
+            <button class="surface-button surface-button-secondary" id="surface-download" type="button" disabled>Download .nc</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <div class="accent-bar"></div>
+          <h2>Program Statistics</h2>
+        </div>
+        <div class="results-grid toolpath-results-grid surface-results-grid">
+          <div class="result-card">
+            <div class="result-label">Raster Passes</div>
+            <div class="result-value" id="surface-stat-raster-passes">-</div>
+            <div class="result-unit">per depth</div>
+          </div>
+          <div class="result-card">
+            <div class="result-label">Depth Passes</div>
+            <div class="result-value" id="surface-stat-depth-passes">-</div>
+            <div class="result-unit">passes</div>
+          </div>
+          <div class="result-card">
+            <div class="result-label">Toolpath Length</div>
+            <div class="result-value" id="surface-stat-toolpath-length">-</div>
+            <div class="result-unit">meters</div>
+          </div>
+          <div class="result-card">
+            <div class="result-label">Machining Time</div>
+            <div class="result-value" id="surface-stat-time">-</div>
+            <div class="result-unit">estimated</div>
+          </div>
+        </div>
+        <p class="disclaimer">Review all generated G-code in your controller or CAM simulator before cutting. This generator assumes millimeters, absolute coordinates, and a flat rectangular work area.</p>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <div class="accent-bar"></div>
+          <h2>G-Code Preview</h2>
+        </div>
+        <textarea id="surface-gcode-output" class="surface-gcode-output" readonly placeholder="Generated G-code will appear here."></textarea>
+      </section>
+
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>Use generated programs as a starting point only. Always verify clearances, workholding, and machine limits before cutting.</p>
+    </div>
+  </footer>
+
+  <script src="surface.js"></script>
+</body>
+</html>
