@@ -1,19 +1,25 @@
-// ── Data ────────────────────────────────────────────────────────────────────
+// ── Configuration Data ───────────────────────────────────────────────────────
 
+// Machine profiles: DOC (depth of cut) and spindle speed index factors
+// EVO = entry-level machines (lower DOC, slower speeds)
+// PRO = mid-range machines (moderate DOC, standard speeds)
+// FAB = high-end machines (full DOC, maximum speeds)
 const MACHINES = {
   EVO: { doc: 0.5,  idx: 0.75 },
   PRO: { doc: 0.8,  idx: 0.90 },
   FAB: { doc: 1.0,  idx: 1.00 },
 };
 
-// Chipload table columns (mm diameters)
+// Tool diameter columns supported by the chipload reference tables (mm)
 const DIAMETERS = [2, 3, 4, 6, 8, 10];
 
-// Scaling factors for beginner / advanced reference tables
+// Safety factors: beginner uses conservative values (larger feed) for novices,
+// advanced uses standard values for experienced operators
 const BEGINNER_FACTOR = 1.00;
 const ADVANCED_FACTOR = 1.00;
 
-// Canonical chipload values + DOC adjustment per material (loads indexed to DIAMETERS)
+// Chipload tables per material. Loads correspond to DIAMETER columns.
+// DOC adjustment accounts for material hardness (harder = shallower cuts recommended)
 const CHIPLOAD = {
   'Hardwood':          { loads: [0.03, 0.06, 0.08, 0.10, 0.12, 0.14], doc: 0.9  },
   'Softwood/Plywood':  { loads: [0.04, 0.08, 0.10, 0.12, 0.14, 0.16], doc: 1.0  },
@@ -23,14 +29,14 @@ const CHIPLOAD = {
   'Aluminium':         { loads: [0.01, 0.025, 0.03, 0.04, 0.05, 0.06], doc: 0.25 },
 };
 
-// ── Helpers ─────────────────────────────────────────────────────────────────
+// ── Helper Functions ──────────────────────────────────────────────────────────
 
+// Interpolate chipload value for diameters between table entries
+// Uses linear interpolation between adjacent diameter columns
 function interpolateChipload(material, diameter) {
   const { loads } = CHIPLOAD[material];
-  // Clamp to table range
   if (diameter <= DIAMETERS[0]) return loads[0];
   if (diameter >= DIAMETERS[DIAMETERS.length - 1]) return loads[loads.length - 1];
-  // Linear interpolation between bracketing columns
   for (let i = 0; i < DIAMETERS.length - 1; i++) {
     if (diameter >= DIAMETERS[i] && diameter <= DIAMETERS[i + 1]) {
       const t = (diameter - DIAMETERS[i]) / (DIAMETERS[i + 1] - DIAMETERS[i]);
@@ -39,34 +45,38 @@ function interpolateChipload(material, diameter) {
   }
 }
 
+// Round spindle speeds/feed to nearest 100 RPM (Excel ROUND(x,-2) style)
+// Ensures minimum 100 for positive values
 function roundNearest100(x) {
-  // Match Excel ROUND(x, -2): rounds to nearest 100, minimum 100 for positive values
   const rounded = Math.round(x / 100) * 100;
   return rounded < 100 && x > 0 ? 100 : rounded;
 }
 
+// Calculate feeds and speeds for a given configuration
+// Returns spindle RPM, feed rate, max DOC, and chipload
 function calculate(machine, diameter, flutes, material, factor, dampenFeed) {
   const m = MACHINES[machine];
   const baseChipload = interpolateChipload(material, diameter);
   const chipload = baseChipload * factor;
+  // DampenFeed uses average flutes for reduced feed (beginner mode safety)
   const effectiveFlutes = dampenFeed ? (flutes + 1) / 2 : flutes;
   const docAdj = CHIPLOAD[material].doc;
 
-  // Spindle is based on material and diameter only; mode scaling affects feed.
+  // Spindle speed based on material (soft = faster) and machine capability
   const spindleRaw = (22000 - baseChipload * 3 * 10000) * m.idx;
   const spindle = roundNearest100(Math.min(spindleRaw, 24000));
 
-  // Beginner matches Mekanika's sheet; advanced uses the standard chipload formula.
+  // Feed rate: chipload × flutes × spindle (with machine scaling and feed damping)
   const feedRaw = chipload * effectiveFlutes * spindle * (dampenFeed ? m.idx : 1);
   const feed = roundNearest100(feedRaw);
 
-  // Max DOC: machineDocFactor × diameter × materialDocAdjust
+  // Max DOC: machine limit × diameter × material adjustment
   const doc = m.doc * diameter * docAdj;
 
   return { spindle, feed, doc, chipload };
 }
 
-// Find the nearest table column index for a given diameter (for highlighting)
+// Find index of nearest diameter column for table highlighting
 function nearestDiameterIndex(tableColumns, diameter) {
   let best = 0;
   let bestDist = Infinity;
@@ -77,8 +87,9 @@ function nearestDiameterIndex(tableColumns, diameter) {
   return best;
 }
 
-// ── DOM refs ───────────────────────────────────────────────────────────────
+// ── DOM References ───────────────────────────────────────────────────────────
 
+// Input controls
 const inpMachine  = document.getElementById('inp-machine');
 const inpDiam     = document.getElementById('inp-diameter');
 const inpFlutes   = document.getElementById('inp-flutes');
@@ -86,7 +97,7 @@ const inpMaterial = document.getElementById('inp-material');
 const resultsArea = document.getElementById('results-area');
 const diamNote    = document.getElementById('diameter-range-note');
 
-// Beginner panel
+// Beginner panel outputs
 const outSpindleBeg  = document.getElementById('out-spindle-beg');
 const outFeedBeg     = document.getElementById('out-feed-beg');
 const outDocBeg      = document.getElementById('out-doc-beg');
@@ -94,7 +105,7 @@ const chiploNoteBeg  = document.getElementById('chipload-note-beg');
 const feedWarningBeg = document.getElementById('feed-warning-beg');
 const rcFeedBeg      = document.getElementById('rc-feed-beg');
 
-// Advanced panel
+// Advanced panel outputs
 const outSpindleAdv  = document.getElementById('out-spindle-adv');
 const outFeedAdv     = document.getElementById('out-feed-adv');
 const outDocAdv      = document.getElementById('out-doc-adv');
@@ -108,33 +119,32 @@ const advTbl = document.getElementById('tbl-advanced');
 const BEG_COLS = DIAMETERS;
 const ADV_COLS = DIAMETERS;
 
-// ── Table highlight ──────────────────────────────────────────────────────────
+// ── Table Highlighting ───────────────────────────────────────────────────────
 
+// Remove all highlight classes from table cells/rows
 function clearHighlights(table) {
   table.querySelectorAll('.hl-cell, .hl-row-material').forEach(el => {
     el.classList.remove('hl-cell', 'hl-row-material');
   });
 }
 
+// Highlight the active material row and nearest diameter column in the reference table
 function highlightTable(table, material, diameter, colDiameters) {
   clearHighlights(table);
   if (!material || !diameter) return;
 
-  // Find the column index for the nearest diameter
   const colIdx = nearestDiameterIndex(colDiameters, diameter);
-  const nearestD = colDiameters[colIdx];
 
-  // The data column cells start at index 1 (index 0 is the material name)
   table.querySelectorAll('tbody tr').forEach(row => {
     const rowMaterial = row.dataset.material;
     const cells = row.querySelectorAll('td');
-    const isMatchingMaterial = rowMaterial === material;
 
-    if (isMatchingMaterial) {
+    if (rowMaterial === material) {
+      // Highlight the entire material row
       cells[0].classList.add('hl-row-material');
-      // Find the cell with matching data-d
+      // Highlight the cell at the nearest diameter column
       cells.forEach(cell => {
-        if (parseInt(cell.dataset.d) === nearestD) {
+        if (parseInt(cell.dataset.d) === colDiameters[colIdx]) {
           cell.classList.add('hl-cell');
         }
       });
@@ -142,8 +152,10 @@ function highlightTable(table, material, diameter, colDiameters) {
   });
 }
 
-// ── Table renderer ───────────────────────────────────────────────────────────
+// ── Table Renderer ────────────────────────────────────────────────────────────
 
+// Build the beginner and advanced chipload reference tables dynamically
+// Creates diameter columns and populates with scaled chipload values
 function renderTables() {
   const tables = [
     { el: begTbl, factor: BEGINNER_FACTOR },
@@ -151,6 +163,7 @@ function renderTables() {
   ];
 
   tables.forEach(({ el, factor }) => {
+    // Build header row with diameter columns
     const headRow = el.tHead.rows[0];
     headRow.innerHTML = '<th>Material</th>';
     DIAMETERS.forEach(d => {
@@ -159,6 +172,7 @@ function renderTables() {
       headRow.appendChild(th);
     });
 
+    // Populate body with material rows and chipload values
     const tbody = el.tBodies[0];
     tbody.innerHTML = '';
     Object.entries(CHIPLOAD).forEach(([material, { loads }]) => {
@@ -181,17 +195,21 @@ function renderTables() {
   });
 }
 
-// ── Main update ──────────────────────────────────────────────────────────────
+// ── Main Update ───────────────────────────────────────────────────────────────
 
+// Recalculate and display feeds/speeds for current input values
+// Updates both panels and highlights reference tables
 function update() {
   const machine  = inpMachine.value;
   const diameter = parseFloat(inpDiam.value);
   const flutes   = parseInt(inpFlutes.value, 10);
   const material = inpMaterial.value;
 
+  // Show note if diameter is outside recommended range
   const diamOutOfRange = diameter && (diameter < 2 || diameter > 10);
   diamNote.classList.toggle('visible', diamOutOfRange);
 
+  // Validate inputs - hide results if incomplete/invalid
   if (!machine || !inpDiam.value || isNaN(diameter) || diameter <= 0 || isNaN(flutes) || !material) {
     resultsArea.classList.remove('visible');
     clearHighlights(begTbl);
@@ -199,11 +217,14 @@ function update() {
     return;
   }
 
+  // Clamp diameter to table range for lookup
   const clampedDiam = Math.max(DIAMETERS[0], Math.min(DIAMETERS[DIAMETERS.length - 1], diameter));
 
+  // Calculate for both modes: beginner (dampened feed) and advanced (standard)
   const beg = calculate(machine, clampedDiam, flutes, material, BEGINNER_FACTOR, true);
   const adv = calculate(machine, clampedDiam, flutes, material, ADVANCED_FACTOR, false);
 
+  // Update beginner panel outputs
   outSpindleBeg.textContent = beg.spindle.toLocaleString('en');
   outFeedBeg.textContent    = beg.feed.toLocaleString('en');
   outDocBeg.textContent     = beg.doc.toFixed(2);
@@ -211,6 +232,7 @@ function update() {
   rcFeedBeg.classList.toggle('has-warning', beg.feed > 7000);
   chiploNoteBeg.textContent = `Chip load: ${beg.chipload.toFixed(4)} mm/tooth at ⌀${diameter} mm`;
 
+  // Update advanced panel outputs
   outSpindleAdv.textContent = adv.spindle.toLocaleString('en');
   outFeedAdv.textContent    = adv.feed.toLocaleString('en');
   outDocAdv.textContent     = adv.doc.toFixed(2);
@@ -224,8 +246,9 @@ function update() {
   highlightTable(advTbl, material, diameter, ADV_COLS);
 }
 
-// ── Init ─────────────────────────────────────────────────────────────────────
+// ── Initialization ────────────────────────────────────────────────────────────
 
+// Build tables on load and wire up input change handlers
 renderTables();
 
 const fields = [
