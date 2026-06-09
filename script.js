@@ -228,7 +228,24 @@ function update() {
 
 renderTables();
 
-[inpMachine, inpDiam, inpFlutes, inpMaterial].forEach(el => {
-  el.addEventListener('input', update);
-  el.addEventListener('change', update);
+const fields = [
+  { el: inpMachine,  key: 'machine'  },
+  { el: inpDiam,     key: 'diameter' },
+  { el: inpFlutes,   key: 'flutes'   },
+  { el: inpMaterial, key: 'material' },
+];
+
+fields.forEach(({ el, key }) => {
+  const saved = localStorage.getItem(key);
+  if (saved !== null) el.value = saved;
+  el.addEventListener('input', () => {
+    localStorage.setItem(key, el.value);
+    update();
+  });
+  el.addEventListener('change', () => {
+    localStorage.setItem(key, el.value);
+    update();
+  });
 });
+
+update();

@@ -1,24 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CNC Feeds &amp; Speeds Calculator</title>
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
 
   <nav class="site-nav" aria-label="Main navigation">
     <div class="container">
       <a class="site-nav-link active" href="index.html">Feeds &amp; Speeds</a>
-      <a class="site-nav-link" href="toolpath.html">Toolpath Planner</a>
-       <a class="site-nav-link active" href="surface.html">Surface G-Code Generator</a>
-   </div>
+      <a class="site-nav-link" href="surface.html">Surface G-Code Generator</a>
+    </div>
   </nav>
 
   <header>
     <div class="container">
-      <h1>CNC Feeds &amp; Speeds <span>Calculator</span></h1>
+      <h1>CNC <span>Feeds &amp; Speeds</span> Calculator</h1>
       <p>For 3-axis CNC milling &mdash; based on chip load theory</p>
     </div>
   </header>
@@ -35,7 +36,7 @@
 
         <div class="calc-form">
           <div class="form-field">
-            <label for="inp-machine">CNC Machine</label>
+            <label for="inp-machine">CNC Machine <span class="surface-info" tabindex="0" aria-label="Select your CNC machine model to apply machine-specific speed and feed scaling factors.">i</span></label>
             <select id="inp-machine">
               <option value="">— select —</option>
               <option value="EVO">EVO</option>
@@ -45,7 +46,7 @@
           </div>
 
           <div class="form-field">
-            <label for="inp-diameter">Tool Diameter</label>
+            <label for="inp-diameter">Tool Diameter <span class="surface-info" tabindex="0" aria-label="Diameter of the cutting tool in millimeters.">i</span></label>
             <div class="input-suffix">
               <input type="number" id="inp-diameter" min="1" max="20" step="0.5" placeholder="e.g. 6">
               <span>mm</span>
@@ -54,7 +55,7 @@
           </div>
 
           <div class="form-field">
-            <label for="inp-flutes"># Flutes</label>
+            <label for="inp-flutes"># Flutes <span class="surface-info" tabindex="0" aria-label="Number of cutting edges on the tool. More flutes allow higher feed rates.">i</span></label>
             <select id="inp-flutes">
               <option value="">— select —</option>
               <option value="1">1</option>
@@ -65,7 +66,7 @@
           </div>
 
           <div class="form-field">
-            <label for="inp-material">Material</label>
+            <label for="inp-material">Material <span class="surface-info" tabindex="0" aria-label="Workpiece material type affects chip load and depth of cut recommendations.">i</span></label>
             <select id="inp-material">
               <option value="">— select —</option>
               <option value="Hardwood">Hardwood</option>
@@ -134,7 +135,8 @@
           </div>
 
           <p class="disclaimer">
-            These are conservative safe starting values. Always do a test cut first and adjust based on your machine, tooling, and material.
+            These are conservative safe starting values. Always do a test cut first and adjust based on your machine,
+            tooling, and material.
             Depending on the material you should <strong>NOT ALWAYS</strong> use the maximum depth of cut.
           </p>
         </div>
@@ -146,7 +148,8 @@
           <div class="accent-bar"></div>
           <h2>Chip Load Reference Tables</h2>
         </div>
-        <p class="tables-intro">Values in mm/tooth, derived from the canonical chip load data. Columns match all diameters defined in the data.</p>
+        <p class="tables-intro">Values in mm/tooth, derived from the canonical chip load data. Columns match all
+          diameters defined in the data.</p>
 
         <div class="tables-wrap">
 
@@ -184,18 +187,23 @@
           <h2>Formula Reference</h2>
         </div>
         <div class="formula-box">
-          <div class="formula-main">Beginner feedrate &nbsp;= N<sub>eff</sub> &times; Chipload &times; RPM &times; Machine index</div>
+          <div class="formula-main">Beginner feedrate &nbsp;= N<sub>eff</sub> &times; Chipload &times; RPM &times;
+            Machine index</div>
           <div class="formula-main">Advanced feedrate &nbsp;= N &times; Chipload &times; RPM</div>
-          <div class="formula-main">RPM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8776; (22&thinsp;000 &minus; Chipload &times; 30&thinsp;000) &times; Machine index &nbsp;&nbsp;[cap: 24&thinsp;000]</div>
-          <div class="formula-main">Max DOC &nbsp;= Machine DOC factor &times; Tool &empty; &times; Material DOC factor</div>
+          <div class="formula-main">RPM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8776; (22&thinsp;000 &minus; Chipload &times;
+            30&thinsp;000) &times; Machine index &nbsp;&nbsp;[cap: 24&thinsp;000]</div>
+          <div class="formula-main">Max DOC &nbsp;= Machine DOC factor &times; Tool &empty; &times; Material DOC factor
+          </div>
           <ul>
-            <li>N<sub>eff</sub> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= effective flutes: (actual flutes + 1) / 2</li>
+            <li>N<sub>eff</sub> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= effective flutes: (actual flutes + 1) / 2
+            </li>
             <li>Chipload &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= chip load per tooth (mm/tooth) — interpolated from table</li>
             <li>RPM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= spindle rotation speed (rev/min)</li>
             <li>Feedrate &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= table movement speed (mm/min)</li>
             <li>Machine index &nbsp;= EVO 0.75 / PRO 0.90 / FAB 1.00 (feed &amp; speed scaling)</li>
             <li>Machine DOC &nbsp;&nbsp;= EVO 0.5&times; / PRO 0.8&times; / FAB 1.0&times; (depth of cut scaling)</li>
-            <li>Material DOC &nbsp;= Hardwood 0.9 / Softwood 1.0 / MDF 1.0 / Soft Plastic 0.8 / Hard Plastic 0.5 / Aluminium 0.25</li>
+            <li>Material DOC &nbsp;= Hardwood 0.9 / Softwood 1.0 / MDF 1.0 / Soft Plastic 0.8 / Hard Plastic 0.5 /
+              Aluminium 0.25</li>
           </ul>
         </div>
       </section>
@@ -216,4 +224,5 @@
 
   <script src="script.js"></script>
 </body>
+
 </html>

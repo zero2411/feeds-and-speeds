@@ -8,8 +8,74 @@ const surfaceStatDepthPasses = document.getElementById('surface-stat-depth-passe
 const surfaceStatToolpathLength = document.getElementById('surface-stat-toolpath-length');
 const surfaceStatTime = document.getElementById('surface-stat-time');
 
+const surfaceSettingsStorageKey = 'cnc-surface-generator-settings';
+const surfaceSettingFields = [
+  'surface-width',
+  'surface-length',
+  'surface-total-depth',
+  'surface-bit-diameter',
+  'surface-stepover',
+  'surface-feedrate',
+  'surface-rpm',
+  'surface-depth-per-pass',
+  'surface-safe-z',
+  'surface-start-x',
+  'surface-start-y',
+  'surface-start-z'
+];
+
 let latestGcode = '';
 let latestInputs = null;
+
+function loadSavedSettings() {
+  try {
+    const savedSettings = JSON.parse(localStorage.getItem(surfaceSettingsStorageKey));
+
+    if (!savedSettings || typeof savedSettings !== 'object') return;
+
+    surfaceSettingFields.forEach((fieldId) => {
+      const field = document.getElementById(fieldId);
+
+      if (field && savedSettings[fieldId] !== undefined) {
+        field.value = savedSettings[fieldId];
+      }
+    });
+
+    if (savedSettings.grainDirection) {
+      const grainInput = document.querySelector(`input[name="grain-direction"][value="${savedSettings.grainDirection}"]`);
+
+      if (grainInput) grainInput.checked = true;
+    }
+  } catch (error) {
+    localStorage.removeItem(surfaceSettingsStorageKey);
+  }
+}
+
+function saveSettings() {
+  const settings = surfaceSettingFields.reduce((savedSettings, fieldId) => {
+    const field = document.getElementById(fieldId);
+
+    if (field) savedSettings[fieldId] = field.value;
+
+    return savedSettings;
+  }, {});
+  const grainInput = document.querySelector('input[name="grain-direction"]:checked');
+
+  settings.grainDirection = grainInput ? grainInput.value : 'X';
+  localStorage.setItem(surfaceSettingsStorageKey, JSON.stringify(settings));
+}
+
+function watchSettings() {
+  surfaceSettingFields.forEach((fieldId) => {
+    const field = document.getElementById(fieldId);
+
+    if (field) field.addEventListener('input', saveSettings);
+  });
+
+  document.querySelectorAll('input[name="grain-direction"]').forEach((field) => {
+    field.addEventListener('change', saveSettings);
+  });
+}
 
 function getInputs() {
   const grainInput = document.querySelector('input[name="grain-direction"]:checked');
@@ -272,3 +338,5 @@ function downloadGcode() {
 
 surfaceForm.addEventListener('submit', generateGcode);
 surfaceDownloadButton.addEventListener('click', downloadGcode);
+loadSavedSettings();
+watchSettings();
