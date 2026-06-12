@@ -1,0 +1,179 @@
+{
+    "data": [
+        {
+            "BMC": "carbide",
+            "description": "SpeTool W04507 DOWN CUT 2 FL 6MM DIA x 24MM CL x 6MM SHANK x 60MM OVL ROUTER BIT",
+            "expressions": {
+                "tool_bodyLength": "48 mm",
+                "tool_description": "'SpeTool W04507 DOWN CUT 2 FL 6MM DIA x 24MM CL x 6MM SHANK x 60MM OVL ROUTER BIT'",
+                "tool_diameter": "6 mm",
+                "tool_fluteLength": "24 mm",
+                "tool_number": "207",
+                "tool_overallLength": "60 mm",
+                "tool_productId": "'SP-D6-H6-D'",
+                "tool_productLink": "'https://spetools.com/en-eu/products/spetool-eu-sc-down-cut-2-fl-6mm-dia-x-24mm-cl-x-6mm-shank-x-60mm-ovl-router-bit'",
+                "tool_shaftDiameter": "6 mm",
+                "tool_shoulderLength": "24 mm",
+                "tool_unit": "'millimeters'"
+            },
+            "geometry": {
+                "CSP": false,
+                "DC": 6,
+                "HAND": true,
+                "LB": 48,
+                "LCF": 24,
+                "NOF": 2,
+                "OAL": 60,
+                "SFDM": 6,
+                "assemblyGaugeLength": 48,
+                "shoulder-diameter": 6,
+                "shoulder-length": 24
+            },
+            "guid": "980c0781-8c62-4b48-bd4e-3c7bad796ee3",
+            "last_modified": 1769868585565,
+            "post-process": {
+                "break-control": false,
+                "comment": "",
+                "diameter-offset": 207,
+                "length-offset": 207,
+                "live": true,
+                "manual-tool-change": false,
+                "number": 207,
+                "turret": 0
+            },
+            "product-id": "SP-D6-H6-D",
+            "product-link": "https://spetools.com/en-eu/products/spetool-eu-sc-down-cut-2-fl-6mm-dia-x-24mm-cl-x-6mm-shank-x-60mm-ovl-router-bit",
+            "reference_guid": "a99a39dc-dd06-4509-85fc-20897cfb3222",
+            "start-values": {
+                "presets": [
+                    {
+                        "expressions": {
+                            "tool_coolant": "'air'",
+                            "tool_feedCutting": "3000 mmpm",
+                            "tool_feedPlunge": "1000 mmpm",
+                            "tool_feedRamp": "1000 mmpm",
+                            "tool_spindleSpeed": "14000 rpm",
+                            "tool_stepdown": "6 mm",
+                            "tool_stepover": "2.4 mm"
+                        },
+                        "f_n": 0.07142857142857144,
+                        "f_z": 0.10714285714285716,
+                        "guid": "2f3764c5-0204-414d-be85-a94a861755f6",
+                        "material": {
+                            "category": "all",
+                            "query": "",
+                            "use-hardness": false
+                        },
+                        "n": 14000,
+                        "n_ramp": 14000,
+                        "name": "default",
+                        "ramp-angle": 2,
+                        "stepdown": 6,
+                        "stepover": 2.4,
+                        "tool-coolant": "air",
+                        "use-stepdown": true,
+                        "use-stepover": true,
+                        "v_c": 263.89378290154264,
+                        "v_f": 3000,
+                        "v_f_leadIn": 3000,
+                        "v_f_leadOut": 3000,
+                        "v_f_plunge": 1000,
+                        "v_f_ramp": 1000,
+                        "v_f_transition": 3000
+                    }
+                ]
+            },
+            "type": "flat end mill",
+            "unit": "millimeters",
+            "vendor": "SpeTool"
+        },
+        {
+            "BMC": "carbide",
+            "description": "SpeTool W04508 UP CUT 2 FL 6MM DIA x 24MM CL x 6MM SHANK x 60MM OVL ROUTER BIT",
+            "expressions": {
+                "tool_bodyLength": "48 mm",
+                "tool_description": "'SpeTool W04508 UP CUT 2 FL 6MM DIA x 24MM CL x 6MM SHANK x 60MM OVL ROUTER BIT'",
+                "tool_diameter": "6 mm",
+                "tool_fluteLength": "24 mm",
+                "tool_number": "208",
+                "tool_overallLength": "60 mm",
+                "tool_productId": "'SP-D6-H6-U'",
+                "tool_productLink": "'https://spetools.com/en-eu/products/de-spetool-upcut-cnc-spiralfraser-6-mm-schnittdurchmesser'",
+                "tool_shaftDiameter": "6 mm",
+                "tool_shoulderLength": "24 mm",
+                "tool_unit": "'millimeters'"
+            },
+            "geometry": {
+                "CSP": false,
+                "DC": 6,
+                "HAND": true,
+                "LB": 48,
+                "LCF": 24,
+                "NOF": 2,
+                "OAL": 60,
+                "SFDM": 6,
+                "assemblyGaugeLength": 48,
+                "shoulder-diameter": 6,
+                "shoulder-length": 24
+            },
+            "guid": "881d9fe7-1bbf-42e6-8057-d3e815fad06c",
+            "last_modified": 1769868585565,
+            "post-process": {
+                "break-control": false,
+                "comment": "",
+                "diameter-offset": 208,
+                "length-offset": 208,
+                "live": true,
+                "manual-tool-change": false,
+                "number": 208,
+                "turret": 0
+            },
+            "product-id": "SP-D6-H6-U",
+            "product-link": "https://spetools.com/en-eu/products/de-spetool-upcut-cnc-spiralfraser-6-mm-schnittdurchmesser",
+            "reference_guid": "9a22cfc5-1e69-4246-bad0-59821b95ee99",
+            "start-values": {
+                "presets": [
+                    {
+                        "expressions": {
+                            "tool_coolant": "'air'",
+                            "tool_feedCutting": "4000 mmpm",
+                            "tool_feedPlunge": "13333 mmpm",
+                            "tool_feedRamp": "1333 mmpm",
+                            "tool_spindleSpeed": "14000 rpm",
+                            "tool_stepdown": "6 mm",
+                            "tool_stepover": "2.4 mm"
+                        },
+                        "f_n": 0.9523571428571428,
+                        "f_z": 0.14285714285714285,
+                        "guid": "2f3764c5-0204-414d-be85-a94a861755f6",
+                        "material": {
+                            "category": "all",
+                            "query": "",
+                            "use-hardness": false
+                        },
+                        "n": 14000,
+                        "n_ramp": 14000,
+                        "name": "default",
+                        "ramp-angle": 2,
+                        "stepdown": 6,
+                        "stepover": 2.4,
+                        "tool-coolant": "air",
+                        "use-stepdown": true,
+                        "use-stepover": true,
+                        "v_c": 263.89378290154264,
+                        "v_f": 4000,
+                        "v_f_leadIn": 4000,
+                        "v_f_leadOut": 4000,
+                        "v_f_plunge": 13333,
+                        "v_f_ramp": 1333,
+                        "v_f_transition": 4000
+                    }
+                ]
+            },
+            "type": "flat end mill",
+            "unit": "millimeters",
+            "vendor": "SpeTool"
+        }
+    ],
+    "version": 36
+}

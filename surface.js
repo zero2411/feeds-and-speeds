@@ -5,6 +5,10 @@ const surfaceForm = document.getElementById('surface-form');
 const surfaceErrors = document.getElementById('surface-errors');
 const surfaceGcodeOutput = document.getElementById('surface-gcode-output');
 const surfaceDownloadButton = document.getElementById('surface-download');
+const surfaceToolSelect = document.getElementById('surface-tool-select');
+const surfaceToolPresetField = document.getElementById('surface-tool-preset-field');
+const surfaceToolPresetSelect = document.getElementById('surface-tool-preset-select');
+const surfaceToolClear = document.getElementById('surface-tool-clear');
 
 // Statistics display elements
 const surfaceStatRasterPasses = document.getElementById('surface-stat-raster-passes');
@@ -28,6 +32,7 @@ const surfaceSettingFields = [
 // Cached outputs for download
 let latestGcode = '';
 let latestInputs = null;
+let selectedSurfaceTool = null;
 
 // Restore saved settings from localStorage on page load
 function loadSavedSettings() {
@@ -351,9 +356,85 @@ function downloadGcode() {
   URL.revokeObjectURL(url);
 }
 
+// ── Tool Database Integration ────────────────────────────────────────────────
+
+function populateSurfaceToolSelector() {
+  if (!window.ToolDB || !surfaceToolSelect) return;
+  const tools = ToolDB.getAllTools().filter(tool => tool.toolType === 'surfacing');
+  surfaceToolSelect.innerHTML = '<option value="">— select —</option>';
+  tools.forEach((tool) => {
+    const option = document.createElement('option');
+    option.value = tool.id;
+    option.textContent = `${tool.name} (${tool.diameter}${tool.units || 'mm'})`;
+    surfaceToolSelect.appendChild(option);
+  });
+}
+
+function populateSurfacePresetSelector(tool) {
+  const materials = Object.keys((tool && tool.materials) || {});
+  surfaceToolPresetSelect.innerHTML = '<option value="">— select —</option>';
+  materials.forEach((material) => {
+    const option = document.createElement('option');
+    option.value = material;
+    option.textContent = material;
+    surfaceToolPresetSelect.appendChild(option);
+  });
+  surfaceToolPresetField.hidden = materials.length === 0;
+}
+
+function selectSurfaceTool(toolId) {
+  selectedSurfaceTool = window.ToolDB && toolId ? ToolDB.getTool(toolId) : null;
+  surfaceToolPresetSelect.value = '';
+  if (!selectedSurfaceTool) {
+    populateSurfacePresetSelector(null);
+    generateGcode();
+    return;
+  }
+  setFieldValue('surface-bit-diameter', selectedSurfaceTool.diameter);
+  populateSurfacePresetSelector(selectedSurfaceTool);
+  saveSettings();
+  generateGcode();
+}
+
+function selectSurfacePreset(material) {
+  if (!selectedSurfaceTool || !material) {
+    generateGcode();
+    return;
+  }
+  const preset = selectedSurfaceTool.materials[material];
+  if (!preset) return;
+  setFieldValue('surface-rpm', preset.rpm);
+  setFieldValue('surface-feedrate', preset.feedrate);
+  setFieldValue('surface-stepover', preset.stepover);
+  setFieldValue('surface-depth-per-pass', preset.depthOfCut);
+  saveSettings();
+  generateGcode();
+}
+
+function clearSurfaceTool() {
+  selectedSurfaceTool = null;
+  surfaceToolSelect.value = '';
+  surfaceToolPresetSelect.value = '';
+  populateSurfacePresetSelector(null);
+  generateGcode();
+}
+
+function setFieldValue(fieldId, value) {
+  if (value === '' || value === null || value === undefined) return;
+  const field = document.getElementById(fieldId);
+  if (field) field.value = value;
+}
+
 // ── Initialization ───────────────────────────────────────────────────────────
 
 surfaceForm.addEventListener('submit', generateGcode);
 surfaceDownloadButton.addEventListener('click', downloadGcode);
+if (surfaceToolSelect) {
+  surfaceToolSelect.addEventListener('change', () => selectSurfaceTool(surfaceToolSelect.value));
+  surfaceToolPresetSelect.addEventListener('change', () => selectSurfacePreset(surfaceToolPresetSelect.value));
+  surfaceToolClear.addEventListener('click', clearSurfaceTool);
+}
 loadSavedSettings();
 watchSettings();
+populateSurfaceToolSelector();
+generateGcode();

@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "data": [
+    {
+      "guid": "30d29abf-c3d9-4137-af82-5478f7f4362a",
+      "description": "Mekanika - 6mm 2F Upcut End Mill",
+      "vendor": "Mekanika",
+      "unit": "mm",
+      "type": "endmill",
+      "machine": "PRO",
+      "calculationMode": "advanced",
+      "geometry": {
+        "DC": 6,
+        "NOF": 2,
+        "SFDM": 6,
+        "LB": 20,
+        "OAL": 60
+      },
+      "postProcess": {},
+      "startValues": [
+        {
+          "material": "Hardwood",
+          "spindleSpeed": 17100,
+          "feedrate": 3400,
+          "plungeFeedrate": 1700,
+          "axialDepthOfCut": 4.32,
+          "radialDepthOfCut": 40,
+          "chipload": 0.1
+        },
+        {
+          "material": "Softwood/Plywood",
+          "spindleSpeed": 16600,
+          "feedrate": 4000,
+          "plungeFeedrate": 2000,
+          "axialDepthOfCut": 4.8,
+          "radialDepthOfCut": 40,
+          "chipload": 0.12
+        },
+        {
+          "material": "MDF/Particleboard",
+          "spindleSpeed": 16000,
+          "feedrate": 4500,
+          "plungeFeedrate": 2300,
+          "axialDepthOfCut": 4.8,
+          "radialDepthOfCut": 40,
+          "chipload": 0.14
+        },
+        {
+          "material": "Soft Plastic",
+          "spindleSpeed": 14400,
+          "feedrate": 5800,
+          "plungeFeedrate": 2900,
+          "axialDepthOfCut": 3.84,
+          "radialDepthOfCut": 40,
+          "chipload": 0.2
+        },
+        {
+          "material": "Hard Plastic",
+          "spindleSpeed": 14900,
+          "feedrate": 5400,
+          "plungeFeedrate": 2700,
+          "axialDepthOfCut": 2.4,
+          "radialDepthOfCut": 40,
+          "chipload": 0.18
+        },
+        {
+          "material": "Aluminium",
+          "spindleSpeed": 18700,
+          "feedrate": 1500,
+          "plungeFeedrate": 800,
+          "axialDepthOfCut": 1.2,
+          "radialDepthOfCut": 40,
+          "chipload": 0.04
+        }
+      ]
+    },
+    {
+      "guid": "3d9ab612-748c-41dc-b564-08a32fbda557",
+      "description": "Mekanika - 6mm 3F Upcut End Mill",
+      "vendor": "Mekanika",
+      "unit": "mm",
+      "type": "endmill",
+      "machine": "PRO",
+      "calculationMode": "beginner",
+      "geometry": {
+        "DC": 6,
+        "NOF": 3,
+        "SFDM": 6,
+        "LB": 20,
+        "OAL": 60
+      },
+      "postProcess": {},
+      "startValues": [
+        {
+          "material": "Hardwood",
+          "spindleSpeed": 17100,
+          "feedrate": 3100,
+          "plungeFeedrate": 1600,
+          "axialDepthOfCut": 4.32,
+          "radialDepthOfCut": 40,
+          "chipload": 0.1
+        },
+        {
+          "material": "Softwood/Plywood",
+          "spindleSpeed": 16600,
+          "feedrate": 3600,
+          "plungeFeedrate": 1800,
+          "axialDepthOfCut": 4.8,
+          "radialDepthOfCut": 40,
+          "chipload": 0.12
+        },
+        {
+          "material": "MDF/Particleboard",
+          "spindleSpeed": 16000,
+          "feedrate": 4000,
+          "plungeFeedrate": 2000,
+          "axialDepthOfCut": 4.8,
+          "radialDepthOfCut": 40,
+          "chipload": 0.14
+        },
+        {
+          "material": "Soft Plastic",
+          "spindleSpeed": 14400,
+          "feedrate": 5200,
+          "plungeFeedrate": 2600,
+          "axialDepthOfCut": 3.84,
+          "radialDepthOfCut": 40,
+          "chipload": 0.2
+        },
+        {
+          "material": "Hard Plastic",
+          "spindleSpeed": 14900,
+          "feedrate": 4800,
+          "plungeFeedrate": 2400,
+          "axialDepthOfCut": 2.4,
+          "radialDepthOfCut": 40,
+          "chipload": 0.18
+        },
+        {
+          "material": "Aluminium",
+          "spindleSpeed": 18700,
+          "feedrate": 1300,
+          "plungeFeedrate": 700,
+          "axialDepthOfCut": 1.2,
+          "radialDepthOfCut": 40,
+          "chipload": 0.04
+        }
+      ]
+    }
+  ]
+}

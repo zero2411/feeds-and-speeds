@@ -14,6 +14,7 @@
     <div class="container">
       <a class="site-nav-link active" href="index.html">Feeds &amp; Speeds</a>
       <a class="site-nav-link" href="surface.html">Surface G-Code Generator</a>
+      <a class="site-nav-link" href="tools.html">Tool Database</a>
     </div>
   </nav>
 
@@ -35,6 +36,25 @@
         </div>
 
         <div class="calc-form">
+          <div class="form-field">
+            <label for="tool-select">Saved Tool</label>
+            <select id="tool-select">
+              <option value="">— select —</option>
+            </select>
+          </div>
+
+          <div class="form-field" id="tool-preset-field" hidden>
+            <label for="tool-preset-select">Material Preset</label>
+            <select id="tool-preset-select">
+              <option value="">— select —</option>
+            </select>
+          </div>
+
+          <div class="form-field tool-clear-field">
+            <label>&nbsp;</label>
+            <button class="surface-button surface-button-secondary" id="tool-clear" type="button">Clear Tool</button>
+          </div>
+
           <div class="form-field">
             <label for="inp-machine">CNC Machine <span class="surface-info" tabindex="0" aria-label="Select your CNC machine model to apply machine-specific speed and feed scaling factors.">i</span></label>
             <select id="inp-machine">
@@ -222,6 +242,8 @@
     </div>
   </footer>
 
+  <script src="js/calc-core.js"></script>
+  <script src="js/tooldb.js"></script>
   <script src="script.js"></script>
 </body>
 

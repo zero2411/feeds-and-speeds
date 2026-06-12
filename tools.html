@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CNC Tool Database</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Main navigation">
+    <div class="container">
+      <a class="site-nav-link" href="index.html">Feeds &amp; Speeds</a>
+      <a class="site-nav-link" href="surface.html">Surface G-Code Generator</a>
+      <a class="site-nav-link active" href="tools.html">Tool Database</a>
+    </div>
+  </nav>
+
+  <header>
+    <div class="container">
+      <h1>CNC <span>Tool Database</span></h1>
+      <p>Store cutters, surfacing bits, and material-specific cutting presets</p>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section class="card">
+        <div class="tools-toolbar">
+          <div class="card-header">
+            <div class="accent-bar"></div>
+            <h2>Saved Tools</h2>
+          </div>
+          <div class="surface-actions tools-actions">
+            <button class="surface-button surface-button-primary" id="tool-add" type="button">Add Tool</button>
+            <button class="surface-button surface-button-secondary" id="tool-export-json" type="button">Export JSON</button>
+            <button class="surface-button surface-button-secondary" id="tool-import-json" type="button">Import JSON</button>
+            <button class="surface-button surface-button-secondary" id="tool-export-csv" type="button">Export CSV</button>
+            <button class="surface-button surface-button-secondary" id="tool-export-fusion" type="button">Export Fusion 360</button>
+            <button class="surface-button surface-button-secondary" id="tool-export-vcarve" type="button">Export VCarve</button>
+            <input id="tool-import-file" type="file" accept="application/json,.json" hidden>
+          </div>
+        </div>
+
+        <div class="calc-form tools-filter-grid">
+          <div class="form-field">
+            <label for="filter-tool-type">Tool Type <span class="surface-info" tabindex="0" aria-label="Filter saved tools by cutter family such as end mill, V-bit, or surfacing cutter.">i</span></label>
+            <select id="filter-tool-type"></select>
+          </div>
+          <div class="form-field">
+            <label for="filter-geometry">Geometry <span class="surface-info" tabindex="0" aria-label="Filter saved tools by cutting geometry such as upcut, downcut, compression, or straight.">i</span></label>
+            <select id="filter-geometry"></select>
+          </div>
+          <div class="form-field">
+            <label for="filter-usage">Usage <span class="surface-info" tabindex="0" aria-label="Filter saved tools by their intended operation, such as roughing, finishing, or surfacing.">i</span></label>
+            <select id="filter-usage"></select>
+          </div>
+        </div>
+
+        <div id="tools-notice" class="tools-notice" hidden></div>
+        <div id="tools-empty" class="tools-empty" hidden>No tools saved yet. Add your first cutter to start building presets.</div>
+
+        <div class="table-overflow">
+          <table class="tools-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Diameter</th>
+                <th>Flutes</th>
+                <th>Tool Type</th>
+                <th>Geometry</th>
+                <th>Usage</th>
+                <th>Materials</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tools-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card tools-editor-card" id="tool-editor-card" hidden>
+        <div class="card-header">
+          <div class="accent-bar"></div>
+          <h2 id="tool-editor-title">Add Tool</h2>
+        </div>
+
+        <form id="tool-form" novalidate>
+          <input type="hidden" id="tool-id">
+          <div class="calc-form surface-form-grid">
+            <div class="form-field">
+              <label for="tool-name">Generated Name <span class="surface-info" tabindex="0" aria-label="The tool name is created automatically from manufacturer, diameter, flutes, geometry, and tool type.">i</span></label>
+              <input type="text" id="tool-name" readonly>
+            </div>
+            <div class="form-field">
+              <label for="tool-manufacturer">Manufacturer <span class="surface-info" tabindex="0" aria-label="Optional brand or supplier name. It is included at the start of the generated tool name.">i</span></label>
+              <input type="text" id="tool-manufacturer">
+            </div>
+            <div class="form-field">
+              <label for="tool-machine">CNC Machine <span class="surface-info" tabindex="0" aria-label="Machine profile used to generate RPM, feedrate, and depth of cut presets for every material.">i</span></label>
+              <select id="tool-machine" required></select>
+            </div>
+            <div class="form-field">
+              <label for="tool-calculation-mode">Calculation Mode <span class="surface-info" tabindex="0" aria-label="Beginner uses the conservative calculator path. Advanced uses the standard calculator path.">i</span></label>
+              <select id="tool-calculation-mode" required></select>
+            </div>
+            <div class="form-field">
+              <label for="tool-type">Tool Type <span class="surface-info" tabindex="0" aria-label="Cutter family. Surfacing cutters get surfacing-specific defaults and are available in the surface generator.">i</span></label>
+              <select id="tool-type" required></select>
+            </div>
+            <div class="form-field">
+              <label for="tool-geometry">Geometry <span class="surface-info" tabindex="0" aria-label="Cutting geometry, such as upcut, downcut, compression, straight, spiral, or insert.">i</span></label>
+              <select id="tool-geometry" required></select>
+            </div>
+            <div class="form-field">
+              <label for="tool-usage">Usage <span class="surface-info" tabindex="0" aria-label="Primary operation this tool is meant for, used for organization and filtering.">i</span></label>
+              <select id="tool-usage" required></select>
+            </div>
+            <div class="form-field" id="tool-surfacing-style-field" hidden>
+              <label for="tool-surfacing-style">Surfacing Cutter Style <span class="surface-info" tabindex="0" aria-label="Specific surfacing cutter style used in the generated name.">i</span></label>
+              <select id="tool-surfacing-style"></select>
+            </div>
+            <div class="form-field">
+              <label for="tool-diameter">Diameter <span class="surface-info" tabindex="0" aria-label="Cutting diameter used to calculate chipload, feedrate, RPM, and depth of cut presets.">i</span></label>
+              <div class="input-suffix">
+                <input type="number" id="tool-diameter" min="0.01" step="0.01" required>
+                <span>mm</span>
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="tool-flutes">Flutes <span class="surface-info" tabindex="0" aria-label="Number of cutting edges. More flutes generally increase generated feedrate.">i</span></label>
+              <input type="number" id="tool-flutes" min="1" step="1" required>
+            </div>
+            <div class="form-field">
+              <label for="tool-shank-diameter">Shank Diameter <span class="surface-info" tabindex="0" aria-label="Diameter of the tool shank held by the collet or spindle.">i</span></label>
+              <div class="input-suffix">
+                <input type="number" id="tool-shank-diameter" min="0" step="0.01">
+                <span>mm</span>
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="tool-cutting-length">Cutting Length <span class="surface-info" tabindex="0" aria-label="Length of the cutting edge. Useful for checking whether a cut is within the tool's capacity.">i</span></label>
+              <div class="input-suffix">
+                <input type="number" id="tool-cutting-length" min="0" step="0.01">
+                <span>mm</span>
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="tool-overall-length">Overall Length <span class="surface-info" tabindex="0" aria-label="Full tool length from tip to end of shank.">i</span></label>
+              <div class="input-suffix">
+                <input type="number" id="tool-overall-length" min="0" step="0.01">
+                <span>mm</span>
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="tool-units">Units <span class="surface-info" tabindex="0" aria-label="Units used for the tool dimensions and generated name. Presets are generated in millimeters.">i</span></label>
+              <select id="tool-units">
+                <option value="mm">Millimeters</option>
+                <option value="in">Inches</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-field tools-notes-field">
+            <label for="tool-notes">Notes <span class="surface-info" tabindex="0" aria-label="Optional free text for supplier codes, coating, stickout, or reminders.">i</span></label>
+            <textarea id="tool-notes" rows="3"></textarea>
+          </div>
+
+          <details class="tools-presets" open>
+            <summary>Generated Material Presets <span class="surface-info" tabindex="0" aria-label="Presets are generated automatically for every supported material from the selected CNC machine, calculation mode, diameter, and flute count.">i</span></summary>
+            <div id="preset-list" class="tools-preset-list"></div>
+          </details>
+
+          <div class="surface-errors" id="tool-errors" hidden></div>
+          <div class="surface-actions">
+            <button class="surface-button surface-button-primary" type="submit">Save Tool</button>
+            <button class="surface-button surface-button-secondary" id="tool-cancel" type="button">Cancel</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>Tool data is stored in this browser with LocalStorage. Export a JSON backup before clearing browser data.</p>
+    </div>
+  </footer>
+
+  <script src="js/calc-core.js"></script>
+  <script src="js/tooldb.js"></script>
+  <script src="vendor/vcarve-template.js"></script>
+  <script src="vendor/sql.js/sql-wasm-binary.js"></script>
+  <script src="vendor/sql.js/sql-wasm.js"></script>
+  <script src="js/export-fusion360.js"></script>
+  <script src="js/export-vcarve.js"></script>
+  <script src="js/tools.js"></script>
+</body>
+</html>

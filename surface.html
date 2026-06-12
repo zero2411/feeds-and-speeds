@@ -12,6 +12,7 @@
     <div class="container">
       <a class="site-nav-link" href="index.html">Feeds &amp; Speeds</a>
       <a class="site-nav-link active" href="surface.html">Surface G-Code Generator</a>
+      <a class="site-nav-link" href="tools.html">Tool Database</a>
     </div>
   </nav>
 
@@ -71,6 +72,22 @@
 
           <h3 class="surface-section-title">Tool Parameters</h3>
           <div class="calc-form surface-form-grid">
+            <div class="form-field">
+              <label for="surface-tool-select">Saved Surfacing Tool</label>
+              <select id="surface-tool-select">
+                <option value="">— select —</option>
+              </select>
+            </div>
+            <div class="form-field" id="surface-tool-preset-field" hidden>
+              <label for="surface-tool-preset-select">Material Preset</label>
+              <select id="surface-tool-preset-select">
+                <option value="">— select —</option>
+              </select>
+            </div>
+            <div class="form-field tool-clear-field">
+              <label>&nbsp;</label>
+              <button class="surface-button surface-button-secondary" id="surface-tool-clear" type="button">Clear Tool</button>
+            </div>
             <div class="form-field">
               <label for="surface-bit-diameter">Bit Diameter <span class="surface-info" tabindex="0" aria-label="Bit diameter is the cutting width of the surfacing bit or fly cutter.">i</span></label>
               <div class="input-suffix">
@@ -200,6 +217,8 @@
     </div>
   </footer>
 
+  <script src="js/calc-core.js"></script>
+  <script src="js/tooldb.js"></script>
   <script src="surface.js"></script>
 </body>
 </html>

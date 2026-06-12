@@ -4,76 +4,27 @@
 // EVO = entry-level machines (lower DOC, slower speeds)
 // PRO = mid-range machines (moderate DOC, standard speeds)
 // FAB = high-end machines (full DOC, maximum speeds)
-const MACHINES = {
-  EVO: { doc: 0.5,  idx: 0.75 },
-  PRO: { doc: 0.8,  idx: 0.90 },
-  FAB: { doc: 1.0,  idx: 1.00 },
-};
+const { MACHINES, DIAMETERS, BEGINNER_FACTOR, ADVANCED_FACTOR, CHIPLOAD } = window.CncCalc;
 
 // Tool diameter columns supported by the chipload reference tables (mm)
-const DIAMETERS = [2, 3, 4, 6, 8, 10];
-
-// Safety factors: beginner uses conservative values (larger feed) for novices,
-// advanced uses standard values for experienced operators
-const BEGINNER_FACTOR = 1.00;
-const ADVANCED_FACTOR = 1.00;
-
-// Chipload tables per material. Loads correspond to DIAMETER columns.
-// DOC adjustment accounts for material hardness (harder = shallower cuts recommended)
-const CHIPLOAD = {
-  'Hardwood':          { loads: [0.03, 0.06, 0.08, 0.10, 0.12, 0.14], doc: 0.9  },
-  'Softwood/Plywood':  { loads: [0.04, 0.08, 0.10, 0.12, 0.14, 0.16], doc: 1.0  },
-  'MDF/Particleboard': { loads: [0.05, 0.10, 0.12, 0.14, 0.17, 0.20], doc: 1.0  },
-  'Soft Plastic':      { loads: [0.07, 0.13, 0.15, 0.20, 0.24, 0.28], doc: 0.8  },
-  'Hard Plastic':      { loads: [0.05, 0.10, 0.12, 0.18, 0.20, 0.22], doc: 0.5  },
-  'Aluminium':         { loads: [0.01, 0.025, 0.03, 0.04, 0.05, 0.06], doc: 0.25 },
-};
-
 // ── Helper Functions ──────────────────────────────────────────────────────────
 
 // Interpolate chipload value for diameters between table entries
 // Uses linear interpolation between adjacent diameter columns
 function interpolateChipload(material, diameter) {
-  const { loads } = CHIPLOAD[material];
-  if (diameter <= DIAMETERS[0]) return loads[0];
-  if (diameter >= DIAMETERS[DIAMETERS.length - 1]) return loads[loads.length - 1];
-  for (let i = 0; i < DIAMETERS.length - 1; i++) {
-    if (diameter >= DIAMETERS[i] && diameter <= DIAMETERS[i + 1]) {
-      const t = (diameter - DIAMETERS[i]) / (DIAMETERS[i + 1] - DIAMETERS[i]);
-      return loads[i] + t * (loads[i + 1] - loads[i]);
-    }
-  }
+  return window.CncCalc.interpolateChipload(material, diameter);
 }
 
 // Round spindle speeds/feed to nearest 100 RPM (Excel ROUND(x,-2) style)
 // Ensures minimum 100 for positive values
 function roundNearest100(x) {
-  const rounded = Math.round(x / 100) * 100;
-  return rounded < 100 && x > 0 ? 100 : rounded;
+  return window.CncCalc.roundNearest100(x);
 }
 
 // Calculate feeds and speeds for a given configuration
 // Returns spindle RPM, feed rate, max DOC, and chipload
 function calculate(machine, diameter, flutes, material, factor, dampenFeed) {
-  const m = MACHINES[machine];
-  const baseChipload = interpolateChipload(material, diameter);
-  const chipload = baseChipload * factor;
-  // DampenFeed uses average flutes for reduced feed (beginner mode safety)
-  const effectiveFlutes = dampenFeed ? (flutes + 1) / 2 : flutes;
-  const docAdj = CHIPLOAD[material].doc;
-
-  // Spindle speed based on material (soft = faster) and machine capability
-  const spindleRaw = (22000 - baseChipload * 3 * 10000) * m.idx;
-  const spindle = roundNearest100(Math.min(spindleRaw, 24000));
-
-  // Feed rate: chipload × flutes × spindle (with machine scaling and feed damping)
-  const feedRaw = chipload * effectiveFlutes * spindle * (dampenFeed ? m.idx : 1);
-  const feed = roundNearest100(feedRaw);
-
-  // Max DOC: machine limit × diameter × material adjustment
-  const doc = m.doc * diameter * docAdj;
-
-  return { spindle, feed, doc, chipload };
+  return window.CncCalc.calculate(machine, diameter, flutes, material, factor, dampenFeed);
 }
 
 // Find index of nearest diameter column for table highlighting
@@ -94,6 +45,10 @@ const inpMachine  = document.getElementById('inp-machine');
 const inpDiam     = document.getElementById('inp-diameter');
 const inpFlutes   = document.getElementById('inp-flutes');
 const inpMaterial = document.getElementById('inp-material');
+const toolSelect  = document.getElementById('tool-select');
+const toolPresetField = document.getElementById('tool-preset-field');
+const toolPresetSelect = document.getElementById('tool-preset-select');
+const toolClear = document.getElementById('tool-clear');
 const resultsArea = document.getElementById('results-area');
 const diamNote    = document.getElementById('diameter-range-note');
 
@@ -118,6 +73,8 @@ const advTbl = document.getElementById('tbl-advanced');
 
 const BEG_COLS = DIAMETERS;
 const ADV_COLS = DIAMETERS;
+let selectedTool = null;
+let selectedPresetMaterial = '';
 
 // ── Table Highlighting ───────────────────────────────────────────────────────
 
@@ -220,9 +177,11 @@ function update() {
   // Clamp diameter to table range for lookup
   const clampedDiam = Math.max(DIAMETERS[0], Math.min(DIAMETERS[DIAMETERS.length - 1], diameter));
 
-  // Calculate for both modes: beginner (dampened feed) and advanced (standard)
-  const beg = calculate(machine, clampedDiam, flutes, material, BEGINNER_FACTOR, true);
-  const adv = calculate(machine, clampedDiam, flutes, material, ADVANCED_FACTOR, false);
+  const preset = getSelectedPreset(material);
+  const calculatedBeg = calculate(machine, clampedDiam, flutes, material, BEGINNER_FACTOR, true);
+  const calculatedAdv = calculate(machine, clampedDiam, flutes, material, ADVANCED_FACTOR, false);
+  const beg = preset ? applyPresetToResult(calculatedBeg, preset) : calculatedBeg;
+  const adv = preset ? applyPresetToResult(calculatedAdv, preset) : calculatedAdv;
 
   // Update beginner panel outputs
   outSpindleBeg.textContent = beg.spindle.toLocaleString('en');
@@ -244,6 +203,91 @@ function update() {
 
   highlightTable(begTbl, material, diameter, BEG_COLS);
   highlightTable(advTbl, material, diameter, ADV_COLS);
+}
+
+// ── Tool Database Integration ────────────────────────────────────────────────
+
+function populateToolSelector() {
+  if (!window.ToolDB || !toolSelect) return;
+  const tools = ToolDB.getAllTools();
+  toolSelect.innerHTML = '<option value="">— select —</option>';
+  tools.forEach((tool) => {
+    const option = document.createElement('option');
+    option.value = tool.id;
+    option.textContent = `${tool.name} (${formatToolDiameter(tool)})`;
+    toolSelect.appendChild(option);
+  });
+}
+
+function populatePresetSelector(tool) {
+  const materials = Object.keys((tool && tool.materials) || {});
+  toolPresetSelect.innerHTML = '<option value="">— select —</option>';
+  materials.forEach((material) => {
+    const option = document.createElement('option');
+    option.value = material;
+    option.textContent = material;
+    toolPresetSelect.appendChild(option);
+  });
+  toolPresetField.hidden = materials.length === 0;
+}
+
+function selectTool(toolId) {
+  selectedTool = window.ToolDB && toolId ? ToolDB.getTool(toolId) : null;
+  selectedPresetMaterial = '';
+  toolPresetSelect.value = '';
+  if (!selectedTool) {
+    populatePresetSelector(null);
+    update();
+    return;
+  }
+  inpMachine.value = selectedTool.machine || inpMachine.value;
+  inpDiam.value = selectedTool.diameter;
+  inpFlutes.value = selectedTool.flutes;
+  persistField(inpMachine, 'machine');
+  persistField(inpDiam, 'diameter');
+  persistField(inpFlutes, 'flutes');
+  populatePresetSelector(selectedTool);
+  update();
+}
+
+function selectPreset(material) {
+  selectedPresetMaterial = material;
+  if (material) {
+    inpMaterial.value = material;
+    persistField(inpMaterial, 'material');
+  }
+  update();
+}
+
+function clearSelectedTool() {
+  selectedTool = null;
+  selectedPresetMaterial = '';
+  toolSelect.value = '';
+  toolPresetSelect.value = '';
+  populatePresetSelector(null);
+  update();
+}
+
+function getSelectedPreset(material) {
+  if (!selectedTool || !selectedPresetMaterial || selectedPresetMaterial !== material) return null;
+  return selectedTool.materials[selectedPresetMaterial] || null;
+}
+
+function applyPresetToResult(result, preset) {
+  return {
+    spindle: preset.rpm || result.spindle,
+    feed: preset.feedrate || result.feed,
+    doc: preset.depthOfCut || result.doc,
+    chipload: preset.chipload || result.chipload
+  };
+}
+
+function formatToolDiameter(tool) {
+  return `${tool.diameter}${tool.units || 'mm'}`;
+}
+
+function persistField(el, key) {
+  localStorage.setItem(key, el.value);
 }
 
 // ── Initialization ────────────────────────────────────────────────────────────
@@ -270,5 +314,12 @@ fields.forEach(({ el, key }) => {
     update();
   });
 });
+
+populateToolSelector();
+if (toolSelect) {
+  toolSelect.addEventListener('change', () => selectTool(toolSelect.value));
+  toolPresetSelect.addEventListener('change', () => selectPreset(toolPresetSelect.value));
+  toolClear.addEventListener('click', clearSelectedTool);
+}
 
 update();
