@@ -36,21 +36,21 @@
           <h3 class="surface-section-title">Workpiece</h3>
           <div class="calc-form surface-form-grid">
              <div class="form-field">
-              <label for="surface-width">Width <span class="surface-info" tabindex="0" aria-label="Width is the distance across the slab on the X axis.">i</span></label>
+              <label for="surface-width">Width <span class="surface-info" aria-label="Width is the distance across the slab on the X axis.">i</span></label>
               <div class="input-suffix">
                 <input type="number" id="surface-width" min="0.1" step="1" value="500">
                 <span>mm</span>
               </div>
             </div>
             <div class="form-field">
-              <label for="surface-length">Length <span class="surface-info" tabindex="0" aria-label="Length is the distance along the slab on the Y axis.">i</span></label>
+              <label for="surface-length">Length <span class="surface-info" aria-label="Length is the distance along the slab on the Y axis.">i</span></label>
               <div class="input-suffix">
                 <input type="number" id="surface-length" min="0.1" step="1" value="800">
                 <span>mm</span>
               </div>
             </div>
             <div class="form-field">
-              <label for="surface-total-depth">Total Depth <span class="surface-info" tabindex="0" aria-label="Total depth is the full amount of material to remove from the top surface.">i</span></label>
+              <label for="surface-total-depth">Total Depth <span class="surface-info" aria-label="Total depth is the full amount of material to remove from the top surface.">i</span></label>
               <div class="input-suffix">
                 <input type="number" id="surface-total-depth" min="0.1" step="0.1" value="1.5">
                 <span>mm</span>
@@ -58,7 +58,7 @@
             </div>
           </div>
 
-          <h3 class="surface-section-title">Grain Direction <span class="surface-info" tabindex="0" aria-label="Choose the direction the grain runs so the raster can cut along the grain where possible.">i</span></h3>
+          <h3 class="surface-section-title">Grain Direction <span class="surface-info" aria-label="Choose the direction the grain runs so the raster can cut along the grain where possible.">i</span></h3>
           <fieldset class="surface-radio-group" aria-label="Grain direction">
             <label class="surface-radio-option">
               <input type="radio" name="grain-direction" value="X" checked>
@@ -89,14 +89,14 @@
               <button class="surface-button surface-button-secondary" id="surface-tool-clear" type="button">Clear Tool</button>
             </div>
             <div class="form-field">
-              <label for="surface-bit-diameter">Bit Diameter <span class="surface-info" tabindex="0" aria-label="Bit diameter is the cutting width of the surfacing bit or fly cutter.">i</span></label>
+              <label for="surface-bit-diameter">Bit Diameter <span class="surface-info" aria-label="Bit diameter is the cutting width of the surfacing bit or fly cutter.">i</span></label>
               <div class="input-suffix">
                 <input type="number" id="surface-bit-diameter" min="0.1" step="0.5" value="25">
                 <span>mm</span>
               </div>
             </div>
             <div class="form-field">
-              <label for="surface-stepover">Stepover <span class="surface-info" tabindex="0" aria-label="Stepover is the percentage of the bit diameter moved sideways between raster passes.">i</span></label>
+              <label for="surface-stepover">Stepover <span class="surface-info" aria-label="Stepover is the percentage of the bit diameter moved sideways between raster passes.">i</span></label>
               <div class="input-suffix">
                 <input type="number" id="surface-stepover" min="10" max="90" step="5" value="60">
                 <span>%</span>
@@ -107,21 +107,21 @@
           <h3 class="surface-section-title">Cutting Parameters</h3>
           <div class="calc-form surface-form-grid">
             <div class="form-field">
-              <label for="surface-feedrate">Feedrate <span class="surface-info" tabindex="0" aria-label="Feedrate is how fast the tool moves while cutting.">i</span></label>
+              <label for="surface-feedrate">Feedrate <span class="surface-info" aria-label="Feedrate is how fast the tool moves while cutting.">i</span></label>
               <div class="input-suffix">
                 <input type="number" id="surface-feedrate" min="1" step="100" value="5000">
                 <span>mm/min</span>
               </div>
             </div>
             <div class="form-field">
-              <label for="surface-rpm">RPM <span class="surface-info" tabindex="0" aria-label="RPM is the spindle speed used for the surfacing operation.">i</span></label>
+              <label for="surface-rpm">RPM <span class="surface-info" aria-label="RPM is the spindle speed used for the surfacing operation.">i</span></label>
               <div class="input-suffix">
                 <input type="number" id="surface-rpm" min="1000" step="500" value="18000">
                 <span>rpm</span>
               </div>
             </div>
             <div class="form-field">
-              <label for="surface-depth-per-pass">Depth Per Pass <span class="surface-info" tabindex="0" aria-label="Depth per pass is the maximum amount removed vertically on each cutting pass.">i</span></label>
+              <label for="surface-depth-per-pass">Depth Per Pass <span class="surface-info" aria-label="Depth per pass is the maximum amount removed vertically on each cutting pass.">i</span></label>
               <div class="input-suffix">
                 <input type="number" id="surface-depth-per-pass" min="0.1" step="0.1" value="0.5">
                 <span>mm</span>
@@ -132,28 +132,28 @@
           <h3 class="surface-section-title">Advanced Settings</h3>
           <div class="calc-form surface-form-grid">
             <div class="form-field">
-              <label for="surface-safe-z">Safe Z <span class="surface-info" tabindex="0" aria-label="Safe Z is the clearance height used for rapid moves above the workpiece.">i</span></label>
+              <label for="surface-safe-z">Safe Z <span class="surface-info" aria-label="Safe Z is the clearance height used for rapid moves above the workpiece.">i</span></label>
               <div class="input-suffix">
                 <input type="number" id="surface-safe-z" step="1" value="10">
                 <span>mm</span>
               </div>
             </div>
             <div class="form-field">
-              <label for="surface-start-x">Start X <span class="surface-info" tabindex="0" aria-label="Start X is the work coordinate for the left edge of the surfacing area.">i</span></label>
+              <label for="surface-start-x">Start X <span class="surface-info" aria-label="Start X is the work coordinate for the left edge of the surfacing area.">i</span></label>
               <div class="input-suffix">
                 <input type="number" id="surface-start-x" step="1" value="0">
                 <span>mm</span>
               </div>
             </div>
             <div class="form-field">
-              <label for="surface-start-y">Start Y <span class="surface-info" tabindex="0" aria-label="Start Y is the work coordinate for the front edge of the surfacing area.">i</span></label>
+              <label for="surface-start-y">Start Y <span class="surface-info" aria-label="Start Y is the work coordinate for the front edge of the surfacing area.">i</span></label>
               <div class="input-suffix">
                 <input type="number" id="surface-start-y" step="1" value="0">
                 <span>mm</span>
               </div>
             </div>
             <div class="form-field">
-              <label for="surface-start-z">Start Z <span class="surface-info" tabindex="0" aria-label="Start Z is the top surface reference before cutting begins.">i</span></label>
+              <label for="surface-start-z">Start Z <span class="surface-info" aria-label="Start Z is the top surface reference before cutting begins.">i</span></label>
               <div class="input-suffix">
                 <input type="number" id="surface-start-z" step="1" value="0">
                 <span>mm</span>

@@ -44,15 +44,15 @@
 
         <div class="calc-form tools-filter-grid">
           <div class="form-field">
-            <label for="filter-tool-type">Tool Type <span class="surface-info" tabindex="0" aria-label="Filter saved tools by cutter family such as end mill, V-bit, or surfacing cutter.">i</span></label>
+            <label for="filter-tool-type">Tool Type <span class="surface-info" aria-label="Filter saved tools by cutter family such as end mill, V-bit, or surfacing cutter.">i</span></label>
             <select id="filter-tool-type"></select>
           </div>
           <div class="form-field">
-            <label for="filter-geometry">Geometry <span class="surface-info" tabindex="0" aria-label="Filter saved tools by cutting geometry such as upcut, downcut, compression, or straight.">i</span></label>
+            <label for="filter-geometry">Geometry <span class="surface-info" aria-label="Filter saved tools by cutting geometry such as upcut, downcut, compression, or straight.">i</span></label>
             <select id="filter-geometry"></select>
           </div>
           <div class="form-field">
-            <label for="filter-usage">Usage <span class="surface-info" tabindex="0" aria-label="Filter saved tools by their intended operation, such as roughing, finishing, or surfacing.">i</span></label>
+            <label for="filter-usage">Usage <span class="surface-info" aria-label="Filter saved tools by their intended operation, such as roughing, finishing, or surfacing.">i</span></label>
             <select id="filter-usage"></select>
           </div>
         </div>
@@ -89,71 +89,71 @@
           <input type="hidden" id="tool-id">
           <div class="calc-form surface-form-grid">
             <div class="form-field">
-              <label for="tool-name">Generated Name <span class="surface-info" tabindex="0" aria-label="The tool name is created automatically from manufacturer, diameter, flutes, geometry, and tool type.">i</span></label>
+              <label for="tool-name">Generated Name <span class="surface-info" aria-label="The tool name is created automatically from manufacturer, diameter, flutes, geometry, and tool type.">i</span></label>
               <input type="text" id="tool-name" readonly>
             </div>
             <div class="form-field">
-              <label for="tool-manufacturer">Manufacturer <span class="surface-info" tabindex="0" aria-label="Optional brand or supplier name. It is included at the start of the generated tool name.">i</span></label>
+              <label for="tool-manufacturer">Manufacturer <span class="surface-info" aria-label="Optional brand or supplier name. It is included at the start of the generated tool name.">i</span></label>
               <input type="text" id="tool-manufacturer">
             </div>
             <div class="form-field">
-              <label for="tool-machine">CNC Machine <span class="surface-info" tabindex="0" aria-label="Machine profile used to generate RPM, feedrate, and depth of cut presets for every material.">i</span></label>
+              <label for="tool-machine">CNC Machine <span class="surface-info" aria-label="Machine profile used to generate RPM, feedrate, and depth of cut presets for every material.">i</span></label>
               <select id="tool-machine" required></select>
             </div>
             <div class="form-field">
-              <label for="tool-calculation-mode">Calculation Mode <span class="surface-info" tabindex="0" aria-label="Beginner uses the conservative calculator path. Advanced uses the standard calculator path.">i</span></label>
+              <label for="tool-calculation-mode">Calculation Mode <span class="surface-info" aria-label="Beginner uses the conservative calculator path. Advanced uses the standard calculator path.">i</span></label>
               <select id="tool-calculation-mode" required></select>
             </div>
             <div class="form-field">
-              <label for="tool-type">Tool Type <span class="surface-info" tabindex="0" aria-label="Cutter family. Surfacing cutters get surfacing-specific defaults and are available in the surface generator.">i</span></label>
+              <label for="tool-type">Tool Type <span class="surface-info" aria-label="Cutter family. Surfacing cutters get surfacing-specific defaults and are available in the surface generator.">i</span></label>
               <select id="tool-type" required></select>
             </div>
             <div class="form-field">
-              <label for="tool-geometry">Geometry <span class="surface-info" tabindex="0" aria-label="Cutting geometry, such as upcut, downcut, compression, straight, spiral, or insert.">i</span></label>
+              <label for="tool-geometry">Geometry <span class="surface-info" aria-label="Cutting geometry, such as upcut, downcut, compression, straight, spiral, or insert.">i</span></label>
               <select id="tool-geometry" required></select>
             </div>
             <div class="form-field">
-              <label for="tool-usage">Usage <span class="surface-info" tabindex="0" aria-label="Primary operation this tool is meant for, used for organization and filtering.">i</span></label>
+              <label for="tool-usage">Usage <span class="surface-info" aria-label="Primary operation this tool is meant for, used for organization and filtering.">i</span></label>
               <select id="tool-usage" required></select>
             </div>
             <div class="form-field" id="tool-surfacing-style-field" hidden>
-              <label for="tool-surfacing-style">Surfacing Cutter Style <span class="surface-info" tabindex="0" aria-label="Specific surfacing cutter style used in the generated name.">i</span></label>
+              <label for="tool-surfacing-style">Surfacing Cutter Style <span class="surface-info" aria-label="Specific surfacing cutter style used in the generated name.">i</span></label>
               <select id="tool-surfacing-style"></select>
             </div>
             <div class="form-field">
-              <label for="tool-diameter">Diameter <span class="surface-info" tabindex="0" aria-label="Cutting diameter used to calculate chipload, feedrate, RPM, and depth of cut presets.">i</span></label>
+              <label for="tool-diameter">Diameter <span class="surface-info" aria-label="Cutting diameter used to calculate chipload, feedrate, RPM, and depth of cut presets.">i</span></label>
               <div class="input-suffix">
                 <input type="number" id="tool-diameter" min="0.01" step="0.01" required>
                 <span>mm</span>
               </div>
             </div>
             <div class="form-field">
-              <label for="tool-flutes">Flutes <span class="surface-info" tabindex="0" aria-label="Number of cutting edges. More flutes generally increase generated feedrate.">i</span></label>
+              <label for="tool-flutes">Flutes <span class="surface-info" aria-label="Number of cutting edges. More flutes generally increase generated feedrate.">i</span></label>
               <input type="number" id="tool-flutes" min="1" step="1" required>
             </div>
             <div class="form-field">
-              <label for="tool-shank-diameter">Shank Diameter <span class="surface-info" tabindex="0" aria-label="Diameter of the tool shank held by the collet or spindle.">i</span></label>
+              <label for="tool-shank-diameter">Shank Diameter <span class="surface-info" aria-label="Diameter of the tool shank held by the collet or spindle.">i</span></label>
               <div class="input-suffix">
                 <input type="number" id="tool-shank-diameter" min="0" step="0.01">
                 <span>mm</span>
               </div>
             </div>
             <div class="form-field">
-              <label for="tool-cutting-length">Cutting Length <span class="surface-info" tabindex="0" aria-label="Length of the cutting edge. Useful for checking whether a cut is within the tool's capacity.">i</span></label>
+              <label for="tool-cutting-length">Cutting Length <span class="surface-info" aria-label="Length of the cutting edge. Useful for checking whether a cut is within the tool's capacity.">i</span></label>
               <div class="input-suffix">
                 <input type="number" id="tool-cutting-length" min="0" step="0.01">
                 <span>mm</span>
               </div>
             </div>
             <div class="form-field">
-              <label for="tool-overall-length">Overall Length <span class="surface-info" tabindex="0" aria-label="Full tool length from tip to end of shank.">i</span></label>
+              <label for="tool-overall-length">Overall Length <span class="surface-info" aria-label="Full tool length from tip to end of shank.">i</span></label>
               <div class="input-suffix">
                 <input type="number" id="tool-overall-length" min="0" step="0.01">
                 <span>mm</span>
               </div>
             </div>
             <div class="form-field">
-              <label for="tool-units">Units <span class="surface-info" tabindex="0" aria-label="Units used for the tool dimensions and generated name. Presets are generated in millimeters.">i</span></label>
+              <label for="tool-units">Units <span class="surface-info" aria-label="Units used for the tool dimensions and generated name. Presets are generated in millimeters.">i</span></label>
               <select id="tool-units">
                 <option value="mm">Millimeters</option>
                 <option value="in">Inches</option>
@@ -162,12 +162,12 @@
           </div>
 
           <div class="form-field tools-notes-field">
-            <label for="tool-notes">Notes <span class="surface-info" tabindex="0" aria-label="Optional free text for supplier codes, coating, stickout, or reminders.">i</span></label>
+            <label for="tool-notes">Notes <span class="surface-info" aria-label="Optional free text for supplier codes, coating, stickout, or reminders.">i</span></label>
             <textarea id="tool-notes" rows="3"></textarea>
           </div>
 
           <details class="tools-presets" open>
-            <summary>Generated Material Presets <span class="surface-info" tabindex="0" aria-label="Presets are generated automatically for every supported material from the selected CNC machine, calculation mode, diameter, and flute count.">i</span></summary>
+            <summary>Generated Material Presets <span class="surface-info" aria-label="Presets are generated automatically for every supported material from the selected CNC machine, calculation mode, diameter, and flute count.">i</span></summary>
             <div id="preset-list" class="tools-preset-list"></div>
           </details>
 
