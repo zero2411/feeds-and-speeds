@@ -150,7 +150,8 @@ function calculatePasses(inputs) {
 // Build array of Y (or X) positions for raster scan lines
 // Starts at workpiece edge minus bit radius, ends at far edge plus bit radius
 function buildRasterLines(inputs) {
-  const margin = inputs.bitDiameter / 2;
+  // const margin = inputs.bitDiameter / 2;
+  const margin = 0;
   const stepoverDistance = calculateStepover(inputs);
   const crossLength = inputs.grainDirection === 'X' ? inputs.length : inputs.width;
   const crossStart = inputs.grainDirection === 'X' ? inputs.startY - margin : inputs.startX - margin;
@@ -226,7 +227,8 @@ function generateHeader(inputs) {
 // Grain direction determines scan axis: X=scan along width, Y=scan along length
 function generateRasterToolpath(inputs) {
   const lines = [];
-  const margin = inputs.bitDiameter / 2;
+  // const margin = inputs.bitDiameter / 2;
+  const margin = 0;
   const rasterLines = buildRasterLines(inputs);
   const depthPasses = calculatePasses(inputs);
   const plungeFeed = Math.min(inputs.feedrate, 1000);  // Limit plunge feed
