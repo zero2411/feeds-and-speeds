@@ -155,7 +155,7 @@ function buildRasterLines(inputs) {
   const stepoverDistance = calculateStepover(inputs);
   const crossLength = inputs.grainDirection === 'X' ? inputs.length : inputs.width;
   const crossStart = inputs.grainDirection === 'X' ? inputs.startY - margin : inputs.startX - margin;
-  const crossEnd = crossStart + crossLength + inputs.bitDiameter;
+  const crossEnd = crossStart + crossLength //+ inputs.bitDiameter;
   const lines = [];
 
   // Generate stepover lines across the workpiece
