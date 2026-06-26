@@ -1,5 +1,5 @@
 (function () {
-  const SQL_JS_PATH = 'vendor/sql.js/';
+  const SQL_JS_PATH = 'assets/vendor/sql.js/';
   const MACHINE_ID = '2a5e48b1-185a-4224-88fd-55b58fbbb892';
   const ROOT_GROUP_NAME = 'Mekanika';
   const SUPPORTED_TOOL_TYPES = new Set(['endmill', 'surfacing']);
