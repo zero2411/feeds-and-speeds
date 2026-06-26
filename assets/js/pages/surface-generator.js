@@ -9,6 +9,9 @@ const surfaceToolSelect = document.getElementById('surface-tool-select');
 const surfaceToolPresetField = document.getElementById('surface-tool-preset-field');
 const surfaceToolPresetSelect = document.getElementById('surface-tool-preset-select');
 const surfaceToolClear = document.getElementById('surface-tool-clear');
+const surfaceTotalDepthGroup = document.getElementById('surface-total-depth-group');
+const surfaceThicknessTargetGroup = document.getElementById('surface-thickness-target-group');
+const surfaceStartZGroup = document.getElementById('surface-start-z-group');
 
 // Statistics display elements
 const surfaceStatRasterPasses = document.getElementById('surface-stat-raster-passes');
@@ -24,6 +27,7 @@ const surfaceSettingsStorageKey = 'cnc-surface-generator-settings';
 // Form fields to persist (by element ID)
 const surfaceSettingFields = [
   'surface-width', 'surface-length', 'surface-total-depth',
+  'surface-initial-thickness', 'surface-final-thickness',
   'surface-bit-diameter', 'surface-stepover', 'surface-feedrate',
   'surface-rpm', 'surface-depth-per-pass', 'surface-safe-z',
   'surface-start-x', 'surface-start-y', 'surface-start-z'
@@ -47,6 +51,11 @@ function loadSavedSettings() {
       }
     });
 
+    if (savedSettings.depthMode) {
+      const depthModeInput = document.querySelector(`input[name="surface-depth-mode"][value="${savedSettings.depthMode}"]`);
+      if (depthModeInput) depthModeInput.checked = true;
+    }
+
     // Also restore grain direction radio selection
     if (savedSettings.grainDirection) {
       const grainInput = document.querySelector(`input[name="grain-direction"][value="${savedSettings.grainDirection}"]`);
@@ -64,6 +73,8 @@ function saveSettings() {
     if (field) savedSettings[fieldId] = field.value;
     return savedSettings;
   }, {});
+  const depthModeInput = document.querySelector('input[name="surface-depth-mode"]:checked');
+  settings.depthMode = depthModeInput ? depthModeInput.value : 'total-depth';
   const grainInput = document.querySelector('input[name="grain-direction"]:checked');
   settings.grainDirection = grainInput ? grainInput.value : 'X';
   localStorage.setItem(surfaceSettingsStorageKey, JSON.stringify(settings));
@@ -78,6 +89,49 @@ function watchSettings() {
   document.querySelectorAll('input[name="grain-direction"]').forEach((field) => {
     field.addEventListener('change', saveSettings);
   });
+  document.querySelectorAll('input[name="surface-depth-mode"]').forEach((field) => {
+    field.addEventListener('change', saveSettings);
+  });
+}
+
+function getDepthMode() {
+  const depthModeInput = document.querySelector('input[name="surface-depth-mode"]:checked');
+  return depthModeInput ? depthModeInput.value : 'total-depth';
+}
+
+function setDepthModeVisibility() {
+  const depthMode = getDepthMode();
+  const isTotalDepthMode = depthMode === 'total-depth';
+  if (surfaceTotalDepthGroup) surfaceTotalDepthGroup.hidden = !isTotalDepthMode;
+  if (surfaceThicknessTargetGroup) surfaceThicknessTargetGroup.hidden = isTotalDepthMode;
+  if (surfaceStartZGroup) surfaceStartZGroup.hidden = !isTotalDepthMode;
+}
+
+function getDepthProfile(inputs) {
+  if (inputs.depthMode === 'thickness-target') {
+    const removalDepth = inputs.initialThickness - inputs.finalThickness;
+    return {
+      mode: inputs.depthMode,
+      referenceLabel: 'machine bed/spoilboard zero',
+      removalDepth,
+      topSurfaceZ: inputs.initialThickness,
+      finalTargetZ: inputs.finalThickness,
+      getPassZ(passNumber) {
+        return Math.max(inputs.finalThickness, inputs.initialThickness - (passNumber * inputs.depthPerPass));
+      }
+    };
+  }
+
+  return {
+    mode: inputs.depthMode,
+    referenceLabel: 'top-of-material zero',
+    removalDepth: inputs.totalDepth,
+    topSurfaceZ: inputs.startZ,
+    finalTargetZ: inputs.startZ - inputs.totalDepth,
+    getPassZ(passNumber) {
+      return inputs.startZ - Math.min(inputs.totalDepth, passNumber * inputs.depthPerPass);
+    }
+  };
 }
 
 // ── Input Handling ──────────────────────────────────────────────────────────
@@ -88,7 +142,10 @@ function getInputs() {
   return {
     width: parseFloat(document.getElementById('surface-width').value),
     length: parseFloat(document.getElementById('surface-length').value),
+    depthMode: getDepthMode(),
     totalDepth: parseFloat(document.getElementById('surface-total-depth').value),
+    initialThickness: parseFloat(document.getElementById('surface-initial-thickness').value),
+    finalThickness: parseFloat(document.getElementById('surface-final-thickness').value),
     grainDirection: grainInput ? grainInput.value : 'X',
     bitDiameter: parseFloat(document.getElementById('surface-bit-diameter').value),
     stepoverPercent: parseFloat(document.getElementById('surface-stepover').value),
@@ -105,10 +162,10 @@ function getInputs() {
 // Validate all inputs; returns array of error messages (empty if valid)
 function validateInputs(inputs) {
   const errors = [];
+  const depthProfile = getDepthProfile(inputs);
   // Check required positive values
   if (!Number.isFinite(inputs.width) || inputs.width <= 0) errors.push('Width must be greater than 0 mm.');
   if (!Number.isFinite(inputs.length) || inputs.length <= 0) errors.push('Length must be greater than 0 mm.');
-  if (!Number.isFinite(inputs.totalDepth) || inputs.totalDepth <= 0) errors.push('Total depth must be greater than 0 mm.');
   if (!Number.isFinite(inputs.bitDiameter) || inputs.bitDiameter <= 0) errors.push('Bit diameter must be greater than 0 mm.');
   if (!Number.isFinite(inputs.stepoverPercent) || inputs.stepoverPercent < 10 || inputs.stepoverPercent > 90) errors.push('Stepover must be between 10% and 90%.');
   if (!Number.isFinite(inputs.feedrate) || inputs.feedrate <= 0) errors.push('Feedrate must be greater than 0 mm/min.');
@@ -118,9 +175,25 @@ function validateInputs(inputs) {
   // Check finite values (can be negative for start positions)
   if (!Number.isFinite(inputs.startX)) errors.push('Start X must be a finite number.');
   if (!Number.isFinite(inputs.startY)) errors.push('Start Y must be a finite number.');
-  if (!Number.isFinite(inputs.startZ)) errors.push('Start Z must be a finite number.');
-  // Safe Z must be above the workpiece
-  if (Number.isFinite(inputs.safeZ) && Number.isFinite(inputs.startZ) && inputs.safeZ <= inputs.startZ) errors.push('Safe Z must be higher than Start Z.');
+
+  if (inputs.depthMode === 'thickness-target') {
+    if (!Number.isFinite(inputs.initialThickness) || inputs.initialThickness <= 0) errors.push('Initial Thickness must be greater than 0 mm when using machine bed/spoilboard zero.');
+    if (!Number.isFinite(inputs.finalThickness) || inputs.finalThickness < 0) errors.push('Final Thickness must be 0 mm or greater when using machine bed/spoilboard zero.');
+    if (Number.isFinite(inputs.initialThickness) && Number.isFinite(inputs.finalThickness) && inputs.finalThickness >= inputs.initialThickness) {
+      errors.push('Final Thickness must be less than Initial Thickness when using machine bed/spoilboard zero.');
+    }
+    if (Number.isFinite(inputs.safeZ) && Number.isFinite(inputs.initialThickness) && inputs.safeZ <= inputs.initialThickness) {
+      errors.push('Safe Z must be higher than the Initial Thickness in thickness-target mode.');
+    }
+  } else {
+    if (!Number.isFinite(inputs.totalDepth) || inputs.totalDepth <= 0) errors.push('Total Depth must be greater than 0 mm when using top-of-material zero.');
+    if (!Number.isFinite(inputs.startZ)) errors.push('Start Z must be a finite number when using top-of-material zero.');
+    if (Number.isFinite(inputs.safeZ) && Number.isFinite(inputs.startZ) && inputs.safeZ <= inputs.startZ) errors.push('Safe Z must be higher than Start Z when using top-of-material zero.');
+  }
+
+  if (Number.isFinite(depthProfile.removalDepth) && depthProfile.removalDepth <= 0) {
+    errors.push('The active depth mode must produce a removal depth greater than 0 mm.');
+  }
   return errors;
 }
 
@@ -135,6 +208,10 @@ function setValidationErrors(errors) {
   surfaceErrors.hidden = false;
 }
 
+function handleLiveValidation() {
+  generateGcode();
+}
+
 // ── Calculation Functions ───────────────────────────────────────────────────
 
 // Calculate stepover distance (mm) from bit diameter and percentage
@@ -144,7 +221,7 @@ function calculateStepover(inputs) {
 
 // Calculate number of depth passes needed
 function calculatePasses(inputs) {
-  return Math.ceil(inputs.totalDepth / inputs.depthPerPass);
+  return Math.ceil(getDepthProfile(inputs).removalDepth / inputs.depthPerPass);
 }
 
 // Build array of Y (or X) positions for raster scan lines
@@ -205,6 +282,20 @@ function formatDuration(minutes) {
 // Generate G-code header with program info and setup commands
 function generateHeader(inputs) {
   const passCount = calculatePasses(inputs);
+  const depthProfile = getDepthProfile(inputs);
+  const depthLines = inputs.depthMode === 'thickness-target'
+    ? [
+        `(Depth Mode: Thickness target)`,
+        `(Z Reference: ${depthProfile.referenceLabel})`,
+        `(Initial Thickness: ${formatNumber(inputs.initialThickness)} mm)`,
+        `(Final Thickness: ${formatNumber(inputs.finalThickness)} mm)`,
+        `(Removal Depth: ${formatNumber(depthProfile.removalDepth)} mm)`
+      ]
+    : [
+        `(Depth Mode: Total depth)`,
+        `(Z Reference: ${depthProfile.referenceLabel})`,
+        `(Total Depth: ${formatNumber(inputs.totalDepth)} mm)`
+      ];
   return [
     '%', '(SURFACING PROGRAM)', '',
     `(Width: ${formatNumber(inputs.width)} mm)`,
@@ -214,7 +305,7 @@ function generateHeader(inputs) {
     `(Feedrate: ${formatNumber(inputs.feedrate)} mm/min)`,
     `(RPM: ${formatNumber(inputs.rpm)})`,
     `(Grain Direction: ${inputs.grainDirection})`,
-    `(Total Depth: ${formatNumber(inputs.totalDepth)} mm)`,
+    ...depthLines,
     `(Passes: ${passCount})`, '',
     'G21', 'G90', 'G17', '',  // Metric, absolute coords, XY plane
     `M3 S${formatNumber(inputs.rpm)}`, '',  // Spindle on
@@ -231,6 +322,7 @@ function generateRasterToolpath(inputs) {
   const margin = 0;
   const rasterLines = buildRasterLines(inputs);
   const depthPasses = calculatePasses(inputs);
+  const depthProfile = getDepthProfile(inputs);
   const plungeFeed = Math.min(inputs.feedrate, 1000);  // Limit plunge feed
 
   // Workpiece bounds including approach margin
@@ -240,7 +332,7 @@ function generateRasterToolpath(inputs) {
   const yMax = inputs.startY + inputs.length + margin;
 
   for (let pass = 1; pass <= depthPasses; pass += 1) {
-    const currentDepth = inputs.startZ - Math.min(inputs.totalDepth, pass * inputs.depthPerPass);
+    const currentDepth = depthProfile.getPassZ(pass);
     lines.push('', `(DEPTH PASS ${pass} OF ${depthPasses} - Z${formatNumber(currentDepth)})`);
     lines.push(`G0 Z${formatNumber(inputs.safeZ)}`);
 
@@ -345,7 +437,10 @@ function generateGcode(event) {
 function downloadGcode() {
   if (!latestGcode || !latestInputs) return;
 
-  const filename = `surface_${formatNumber(latestInputs.width)}x${formatNumber(latestInputs.length)}_${formatNumber(latestInputs.totalDepth)}mm.nc`;
+  const depthSuffix = latestInputs.depthMode === 'thickness-target'
+    ? `final-${formatNumber(latestInputs.finalThickness)}mm`
+    : `${formatNumber(latestInputs.totalDepth)}mm`;
+  const filename = `surface_${formatNumber(latestInputs.width)}x${formatNumber(latestInputs.length)}_${depthSuffix}.nc`;
   const blob = new Blob([latestGcode], { type: 'text/plain' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
@@ -418,6 +513,7 @@ function clearSurfaceTool() {
   surfaceToolSelect.value = '';
   surfaceToolPresetSelect.value = '';
   populateSurfacePresetSelector(null);
+   saveSettings();
   generateGcode();
 }
 
@@ -430,13 +526,22 @@ function setFieldValue(fieldId, value) {
 // ── Initialization ───────────────────────────────────────────────────────────
 
 surfaceForm.addEventListener('submit', generateGcode);
+surfaceForm.addEventListener('input', handleLiveValidation);
+surfaceForm.addEventListener('change', handleLiveValidation);
 surfaceDownloadButton.addEventListener('click', downloadGcode);
 if (surfaceToolSelect) {
   surfaceToolSelect.addEventListener('change', () => selectSurfaceTool(surfaceToolSelect.value));
   surfaceToolPresetSelect.addEventListener('change', () => selectSurfacePreset(surfaceToolPresetSelect.value));
   surfaceToolClear.addEventListener('click', clearSurfaceTool);
 }
+document.querySelectorAll('input[name="surface-depth-mode"]').forEach((field) => {
+  field.addEventListener('change', () => {
+    setDepthModeVisibility();
+    saveSettings();
+  });
+});
 loadSavedSettings();
+setDepthModeVisibility();
 watchSettings();
 populateSurfaceToolSelector();
 generateGcode();

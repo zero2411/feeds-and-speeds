@@ -49,10 +49,42 @@
                 <span>mm</span>
               </div>
             </div>
+          </div>
+
+          <h3 class="surface-section-title">Depth Mode <span class="surface-info" aria-label="Choose whether Z zero is set on the material top or on the machine bed/spoilboard.">i</span></h3>
+          <fieldset class="surface-radio-group" aria-label="Depth mode">
+            <label class="surface-radio-option">
+              <input type="radio" name="surface-depth-mode" value="total-depth" checked>
+              <span>Total depth</span>
+            </label>
+            <label class="surface-radio-option">
+              <input type="radio" name="surface-depth-mode" value="thickness-target">
+              <span>Thickness target</span>
+            </label>
+          </fieldset>
+
+          <div class="calc-form surface-form-grid surface-mode-group" id="surface-total-depth-group">
             <div class="form-field">
               <label for="surface-total-depth">Total Depth <span class="surface-info" aria-label="Total depth is the full amount of material to remove from the top surface.">i</span></label>
               <div class="input-suffix">
                 <input type="number" id="surface-total-depth" min="0.1" step="0.1" value="1.5">
+                <span>mm</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="calc-form surface-form-grid surface-mode-group" id="surface-thickness-target-group" hidden>
+            <div class="form-field">
+              <label for="surface-initial-thickness">Initial Thickness <span class="surface-info" aria-label="Initial thickness is the stock top height above the machine bed or spoilboard when using bed-zero thickness targeting.">i</span></label>
+              <div class="input-suffix">
+                <input type="number" id="surface-initial-thickness" min="0" step="0.1" value="40">
+                <span>mm</span>
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="surface-final-thickness">Final Thickness <span class="surface-info" aria-label="Final thickness is the target finished height above the machine bed or spoilboard when using bed-zero thickness targeting.">i</span></label>
+              <div class="input-suffix">
+                <input type="number" id="surface-final-thickness" min="0" step="0.1" value="38.5">
                 <span>mm</span>
               </div>
             </div>
@@ -152,7 +184,7 @@
                 <span>mm</span>
               </div>
             </div>
-            <div class="form-field">
+            <div class="form-field surface-mode-group" id="surface-start-z-group">
               <label for="surface-start-z">Start Z <span class="surface-info" aria-label="Start Z is the top surface reference before cutting begins.">i</span></label>
               <div class="input-suffix">
                 <input type="number" id="surface-start-z" step="1" value="0">

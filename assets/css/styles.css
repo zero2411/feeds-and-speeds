@@ -632,6 +632,10 @@ footer a:hover {
   accent-color: var(--accent);
 }
 
+.surface-mode-group[hidden] {
+  display: none;
+}
+
 .surface-actions {
   display: flex;
   flex-wrap: wrap;
